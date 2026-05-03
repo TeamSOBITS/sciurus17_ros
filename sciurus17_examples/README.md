@@ -1,314 +1,242 @@
-[English](README.en.md) | [日本語](README.md)
-
 # sciurus17_examples
 
-Sciurus17のためのパッケージ、 `sciurus17` で用いるサンプルをまとめたパッケージです。
+このパッケージはSciurus17 ROS 2パッケージのサンプルコード集です。
 
-## システムの起動方法
+- [sciurus17\_examples](#sciurus17_examples)
+  - [Setup](#setup)
+    - [Using Sciurus17](#using-sciurus17)
+    - [Using Gazebo](#using-gazebo)
+    - [Using Mock Components](#using-mock-components)
+  - [How to Run](#how-to-run)
+  - [Examples](#examples)
+    - [gripper\_control](#gripper_control)
+    - [neck\_control](#neck_control)
+    - [waist\_control](#waist_control)
+    - [pick\_and\_place\_right\_arm\_waist](#pick_and_place_right_arm_waist)
+    - [pick\_and\_place\_left\_arm](#pick_and_place_left_arm)
+    - [head\_camera\_tracking](#head_camera_tracking)
+    - [chest\_camera\_tracking](#chest_camera_tracking)
+    - [point\_cloud\_detection](#point_cloud_detection)
 
-Sciurus17の頭部カメラ、胸部カメラ、制御信号の各ケーブルを制御用パソコンへ接続します。  
-本体の電源をONにしカメラが接続されていることを確認します。  
-Terminalを開き、 `sciurus17_bringup` の `sciurus17_bringup.launch` を起動します。このlaunchファイルには次のオプションが用意されています。
+## Setup
 
-- use_rviz (default: true)  
-Rvizを使用する/使用しない
-- use_head_camera (default: true)  
-頭部カメラを使用する/使用しない
-- use_chest_camera (default: true)  
-胸部カメラを使用する/使用しない
+### Using Sciurus17
 
-### シミュレータを使う場合
+#### 1. Sciurus17本体をPCに接続する
 
-実機無しで動作を確認する場合、制御信号のケーブルを接続しない状態で次のコマンドを実行します。  
+Sciurus17本体をPCに接続します。
+接続方法は製品マニュアルを参照してください。
 
-```
-roslaunch sciurus17_bringup sciurus17_bringup.launch
-```
+> [!NOTE]
+> Sciurus17本体が接触しないように、十分なスペースを確保してください。
 
-### 実機を使う場合
+#### 2. USB通信ポートの接続を確認する
 
-実機で動作を確認する場合、制御信号のケーブルを接続し取り扱い説明書に従いモータパワーをONにした状態で次のコマンドを実行します。  
+USB通信ポートの設定については`sciurus17_control`の[README](../sciurus17_control/README.md)を参照してください。
 
-```
-roslaunch sciurus17_bringup sciurus17_bringup.launch
-```
+> [!NOTE]
+> 正しく設定できていない場合、Sciurus17が動作しないので注意してください。
 
-### カメラを使用しない場合
+#### 3. move_groupとcontrollerを起動する
 
-次のようにオプションを指定するとカメラを使用しない状態で起動します。
-
-```
-roslaunch sciurus17_bringup sciurus17_bringup.launch use_head_camera:=false use_chest_camera:=false
-```
-
-### rvizを使用しない場合
-
-次のようにオプションを指定するとrvizによる画面表示を使用しない状態で起動します。画面表示を省略することで制御用パソコンの負荷を下げることができます。  
-
-```
-roslaunch sciurus17_bringup sciurus17_bringup.launch use_rviz:=false
-```
-
-### Gazeboを使う場合
-
-次のコマンドで起動します。実機との接続やsciurus17_bringupの実行は必要ありません。
+次のコマンドでmove_group (`sciurus17_moveit_config`)とcontroller (`sciurus17_control`)を起動します。
 
 ```sh
-roslaunch sciurus17_gazebo sciurus17_with_table.launch
-
-# rvizを使用しない場合
-roslaunch sciurus17_gazebo sciurus17_with_table.launch use_rviz:=false
-```
-
-## サンプルの実行方法
-
-`sciurus17_bringup.launch`を実行している状態で各サンプルを実行することができます。  
-
-### gripper_action_example.pyの実行
-
-両腕のハンドを開閉させるコード例です。   
-次のコマンドで26度まで開いて閉じる動作を実行します。
-
-```
-rosrun sciurus17_examples gripper_action_example.py
-```
-
-動作させると[こちら](https://youtu.be/iTAAUA_fRXw)（[rviz](https://youtu.be/55YOCixB9VI)）のような動きになります。
-
-![gripper_action_example](https://github.com/rt-net/sciurus17_ros/blob/images/images/gazebo_gripper_example.gif)
-
----
-
-### neck_joint_trajectory_example.pyの実行 
-
-首の角度を変更するコード例です。
-次のコマンドで頭を上下左右へ向ける動作を実行します。
-
-```
-rosrun sciurus17_examples neck_joint_trajectory_example.py
-```
-
-動作させると[こちら](https://youtu.be/_4J5bpFNQuI)（[rviz](https://youtu.be/scge_3v7-EA)）のような動きになります。
-
-![neck_joint_trajectory_example](https://github.com/rt-net/sciurus17_ros/blob/images/images/gazebo_neck_example.gif)
-
----
-
-### waist_joint_trajectory_example.pyの実行
-
-腰の角度を変更するコード例です。
-次のコマンドで腰を左右へひねる動作を実行します。
-
-```
-rosrun sciurus17_examples waist_joint_trajectory_example.py
-```
-
-動作させると[こちら](https://youtu.be/sxu-kN4Qc-o)のような動きになります。
-
-![waist_joint_trajectory_example](https://github.com/rt-net/sciurus17_ros/blob/images/images/gazebo_waist_example.gif)
-
----
-
-### Pick & Place デモの実行
-
-右手でターゲットを掴んで動かすデモ動作を次のコマンドで実行します。腰の回転も使用します。
-
-```
-rosrun sciurus17_examples pick_and_place_right_arm_demo.py
-```
-
-動作させると[こちら](https://youtu.be/kjaiWhr-dLg)のような動きになります。
-
-![pick_and_place_right_arm](https://github.com/rt-net/sciurus17_ros/blob/images/images/gazebo_pick_and_place_right.gif)
-
-左手でターゲットを掴んで動かすデモ動作を次のコマンドで実行します。
-
-```
-rosrun sciurus17_examples pick_and_place_left_arm_demo.py
-```
-
-動作させると[こちら](https://youtu.be/UycaNEHWbv8)のような動きになります。
-
-![pick_and_place_left_arm](https://github.com/rt-net/sciurus17_ros/blob/images/images/gazebo_pick_and_place_left.gif)
-
-両手でターゲットを掴んで動かすデモ動作を次のコマンドで実行します。
-
-```
-rosrun sciurus17_examples pick_and_place_two_arm_demo.py
-```
-
-動作させると[こちら](https://youtu.be/GgKYfSm1NY4)（[rviz](https://youtu.be/xo3OiJgu7wg)）のような動きになります。
-
-![pick_and_place_two_arm](https://github.com/rt-net/sciurus17_ros/blob/images/images/gazebo_pick_and_place_two.gif)
-
----
-
-### hand_position_publisherの実行
-
-tfの機能でリンク位置を求めるノード例です。  
-l_link7とr_link7について、base_linkを基準とした座標をそれぞれ`/sciurus17/hand_pos/left`トピックと
-`/sciurus17/hand_pos/right`トピックへ配信します。  
-次のコマンドでノードを起動します。  
-
-```
-rosrun sciurus17_examples hand_position_publisher_example.py
+ros2 launch sciurus17_examples demo.launch.py
 ```
 
 ---
 
-### head_camera_tracking.pyの実行
+### Using Gazebo
 
-頭のカメラを使うコード例です。
-OpenCVを使ってボール追跡と顔追跡をします。
+#### 1. move_groupとGazeboを起動する
 
-次のコマンドでOpenCVのPythonライブラリをインストールしてください。
+次のコマンドでmove_group (`sciurus17_moveit_config`)とGazeboを起動します。
+
 ```sh
-pip2 install opencv-python
+ros2 launch sciurus17_gazebo sciurus17_with_table.launch.py
 ```
 
-次のコマンドでノードを起動します。
-```sh
-rosrun sciurus17_examples head_camera_tracking.py
-```
-
-*ボール追跡をする場合*
-
-[`./scripts/head_camera_tracking.py`](./scripts/head_camera_tracking.py)を編集します。
-
-```python
-def _image_callback(self, ros_image):
-    # ~~~ 省略 ~~~
-
-        # オブジェクト(特定色 or 顔) の検出
-        output_image = self._detect_orange_object(input_image)
-        # output_image = self._detect_blue_object(input_image)
-        # output_image = self._detect_face(input_image)
-```
-
-動作させると[こちら](https://youtu.be/W39aswfINNU)のような動きになります。
-
-![head_camera_tracking](https://github.com/rt-net/sciurus17_ros/blob/images/images/gazebo_head_camera.gif)
-
-  - 動画で使用しているボールは、アールティショップの
-[こちらのページ](https://www.rt-shop.jp/index.php?main_page=product_info&cPath=1299_1307&products_id=3701)
-で購入できます。
-
-*顔追跡をする場合*
-
-[`./scripts/head_camera_tracking.py`](./scripts/head_camera_tracking.py)を編集します。
-
-顔追跡にはカスケード型分類器を使用します。
-
-カスケードファイルのディレクトリを設定してください。
-**USER_NAME** は環境に合わせて書き換えてください。
-
-```python
-class ObjectTracker:
-    def __init__(self):
-        # ~~~ 省略 ~~~
-
-        # カスケードファイルの読み込み
-        # 例
-        # self._face_cascade = cv2.CascadeClassifier("/home/USER_NAME/.local/lib/python2.7/site-packages/cv2/data/haarcascade_frontalface_alt2.xml")
-        # self._eyes_cascade = cv2.CascadeClassifier("/home/USER_NAME/.local/lib/python2.7/site-packages/cv2/data/haarcascade_eye.xml")
-        self._face_cascade = cv2.CascadeClassifier("/home/USER_NAME/.local/lib/python2.7/site-packages/cv2/data/haarcascade_frontalface_alt2.xml")
-        self._eyes_cascade = cv2.CascadeClassifier("/home/USER_NAME/.local/lib/python2.7/site-packages/cv2/data/haarcascade_eye.xml")
-```
-
-```python
-def _image_callback(self, ros_image):
-    # ~~~ 省略 ~~~
-
-        # オブジェクト(特定色 or 顔) の検出
-        # output_image = self._detect_orange_object(input_image)
-        # output_image = self._detect_blue_object(input_image)
-        output_image = self._detect_face(input_image)
-```
-
-動作させると[こちら](https://youtu.be/I67OD25NkMg)のような動きになります。
+> [!NOTE]
+> 頭部カメラや胸部カメラのシミュレーションを行わない場合は、`use_head_camera`、`use_chest_camera`オプションを`false`に設定します。
+> 
+> ```sh
+> ros2 launch sciurus17_gazebo sciurus17_with_table.launch.py use_head_camera:=false use_chest_camera:=false
+> ```
 
 ---
 
-### chest_camera_tracking.pyの実行
+### Using Mock Components
 
-胸のカメラを使うコード例です。
-OpenCVを使ってボール追跡をします。
+#### 1. move_groupとcontrollerを起動する
 
-次のコマンドでOpenCVのPythonライブラリをインストールしてください。
-```sh
-pip2 install opencv-python
-```
-
-次のコマンドでノードを起動します。
-```sh
-rosrun sciurus17_examples chest_camera_tracking.py
-```
-
-動作させると[こちら](https://youtu.be/wscw-I4wCaM)のような動きになります。
-
-![chest_camera_tracking](https://github.com/rt-net/sciurus17_ros/blob/images/images/gazebo_chest_camera.gif)
-
-*顔追跡とボール追跡の同時実行*
-
-頭カメラと胸のカメラの両方を使って、顔追跡とボール追跡をします。
+次のコマンドでmove_group (`sciurus17_moveit_config`)とcontroller (`sciurus17_control`)を起動します。
 
 ```sh
-rosrun sciurus17_examples head_camera_tracking.py
-
-# 別のターミナルで実行
-rosrun sciurus17_examples chest_camera_tracking.py
+ros2 launch sciurus17_examples demo.launch.py use_mock_components:=true
 ```
 
-動作させると[こちら](https://youtu.be/c81I0GaC2DU)のような動きになります。
+Mock Componentsではカメラを使ったサンプルを実行することはできません。
+
+## How to Run Examples
+
+準備ができたらサンプルプログラムを実行します。
+例えばグリッパを開閉するサンプルは次のコマンドで実行できます。
+
+```sh
+ros2 launch sciurus17_examples example.launch.py example:='gripper_control'
+```
+
+終了するときは`Ctrl+c`を入力します。
+
+
+> [!NOTE]
+> Gazeboでサンプルプログラムを実行する場合は`use_sim_time`オプションを付けます。
+> 
+> ```sh
+> ros2 launch sciurus17_examples example.launch.py example:='gripper_control' use_sim_time:='true'
+> ```
+
+## Examples
+
+`demo.launch`を実行している状態で各サンプルを実行できます。
+
+- [gripper\_control](#gripper_control)
+- [neck\_control](#neck_control)
+- [waist\_control](#waist_control)
+- [pick\_and\_place\_right\_arm\_waist](#pick_and_place_right_arm_waist)
+- [pick\_and\_place\_left\_arm](#pick_and_place_left_arm)
+- [head\_camera\_tracking](#head_camera_tracking)
+- [chest\_camera\_tracking](#chest_camera_tracking)
+- [point\_cloud\_detection](#point_cloud_detection)
+
+実行できるサンプルの一覧は、`example.launch.py`にオプション`-s`を付けて実行することで表示できます。
+
+```sh
+ros2 launch sciurus17_examples example.launch.py -s
+```
+
+### gripper_control
+
+ハンドを開閉させるコード例です。
+
+次のコマンドを実行します。
+
+```sh
+ros2 launch sciurus17_examples example.launch.py example:='gripper_control'
+```
+
+[Back to example list](#examples)
 
 ---
 
-### depth_camera_tracking.pyの実行
+### neck_control
 
-頭の深度カメラを使うコード例です。
-指定深度内の物体を追跡します。
+首を上下左右へ動かすコード例です。
 
-次のコマンドでOpenCVのPythonライブラリをインストールしてください。
+次のコマンドを実行します。
+
 ```sh
-pip2 install opencv-python
+ros2 launch sciurus17_examples example.launch.py example:='neck_control'
 ```
 
-次のコマンドでノードを起動します。
-```sh
-rosrun sciurus17_examples depth_camera_tracking.py
-```
-
-デフォルトでは検出範囲を4段階に分けています。
-検出範囲を変更する場合は[`./scripts/depth_camera_tracking.py`](./scripts/depth_camera_tracking.py)を編集します。
-
-```python
-    def _detect_object(self, input_depth_image):
-        # 検出するオブジェクトの大きさを制限する
-        MIN_OBJECT_SIZE = 10000 # px * px
-        MAX_OBJECT_SIZE = 80000 # px * px
-
-        # 検出範囲を4段階設ける
-        # 単位はmm
-        DETECTION_DEPTH = [
-                (500, 700),
-                (600, 800),
-                (700, 900),
-                (800, 1000)]
-```
+[Back to example list](#examples)
 
 ---
 
-### preset_pid_gain_example.launchの実行
+### waist_control
 
-`sciurus17_control`の`preset_reconfigure`を使うコード例です。
-サーボモータのPIDゲインを一斉に変更できます。
+腰を左右へひねる動作をするコード例です。
 
-プリセットは[sciurus17_control/scripts/preset_reconfigure.py](../sciurus17_control/scripts/preset_reconfigure.py)
-にて編集できます。
-
-次のコマンドを実行すると、`preset_reconfigure.py`と`preset_pid_gain_example.py`のノードを起動します。
+次のコマンドを実行します。
 
 ```sh
-roslaunch sciurus17_examples preset_pid_gain_example.launch
+ros2 launch sciurus17_examples example.launch.py example:='waist_control'
 ```
 
+[Back to example list](#examples)
+
+---
+
+### pick_and_place_right_arm_waist
+
+右手でターゲットを掴んで動かすコード例です。腰の回転も使用します。
+
+次のコマンドを実行します。
+
+```sh
+ros2 launch sciurus17_examples example.launch.py example:='pick_and_place_right_arm_waist'
+```
+
+[Back to example list](#examples)
+
+---
+
+### pick_and_place_left_arm
+
+左手でターゲットを掴んで動かすコード例です。
+
+次のコマンドを実行します。
+
+```sh
+ros2 launch sciurus17_examples example.launch.py example:='pick_and_place_left_arm'
+```
+
+[Back to example list](#examples)
+
+---
+
+### head_camera_tracking
+
+頭部カメラ映像を用いてオレンジ色の物体を追従するコード例です。
+
+次のコマンドを実行します。
+
+```sh
+ros2 launch sciurus17_examples head_camera_tracking.launch.py
+```
+
+> [!NOTE]
+> Gazeboで実行する場合は動作環境によってうまく追従しない場合があります。
+> カメラ解像度やサンプルコード内の追従速度ゲインを調整してください。
+
+[Back to example list](#examples)
+
+---
+
+### chest_camera_tracking
+
+胸部カメラ映像を用いてオレンジ色の物体を追従するコード例です。
+
+次のコマンドを実行します。
+
+```sh
+ros2 launch sciurus17_examples chest_camera_tracking.launch.py
+```
+
+> [!NOTE]
+> Gazeboで実行する場合は動作環境によってうまく追従しない場合があります。
+> カメラ解像度やサンプルコード内の追従速度ゲインを調整してください。
+
+[Back to example list](#examples)
+
+---
+
+### point_cloud_detection
+
+点群から物体を検出して掴むコード例です。
+
+- 検出された物体位置はtfのフレームとして配信されます。
+- tfの`frame_id`は検出された順に`target_0`、`target_1`、`target_2`…に設定されます。
+- 掴む対象はSciurus17前方の0.3 mの範囲にある`target_0`に設定されています。
+- 物体検出には[Point Cloud Library](https://pointclouds.org/)を使用しています。
+
+次のコマンドを実行します。
+
+```sh
+ros2 launch sciurus17_examples camera_example.launch.py example:='point_cloud_detection'
+```
+
+[Back to example list](#examples)
+
+---

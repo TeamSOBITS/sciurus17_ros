@@ -1,33 +1,28 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(sciurus17_gazebo)
 
-find_package(catkin REQUIRED COMPONENTS
-  rospy
-  gazebo_msgs
-  std_srvs
+find_package(ament_cmake REQUIRED COMPONENTS
+  gazebo_ros
+  gazebo_plugins
+  gazebo_ros_control
 )
 
-# catkin_python_setup()
-
-###################################
-## catkin specific configuration ##
-###################################
-catkin_package(
+install(DIRECTORY
+  config
+  launch
+  models
+  worlds
+  gui
+  DESTINATION share/${PROJECT_NAME}/
 )
 
-###########
-## Build ##
-###########
-link_directories(${GAZEBO_LIBRARY_DIRS})
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-#############
-## Install ##
-#############
-foreach(dir config launch models scripts worlds)
-  install(DIRECTORY ${dir}/ 
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir}
-  )
-endforeach(dir)
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+endif()
+
+ament_package()

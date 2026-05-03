@@ -1,24 +1,28 @@
 <?xml version="1.0"?>
-<package>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>sciurus17_gazebo</name>
-  <version>0.0.0</version>
+  <version>4.0.0</version>
   <description>The sciurus17_gazebo package</description>
-
   <maintainer email="shop@rt-net.jp">RT Corporation</maintainer>
+  <license>Apache License 2.0</license>
+
   <author email="nomura@rt-net.jp">Hiroyuki Nomura</author>
-  <license>NON-COMMERCIAL LICENSE AGREEMENT</license>
+  <author email="kuwagata@rt-net.jp">Atsushi Kuwagata</author>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <run_depend>gazebo_ros_control</run_depend>
-  <run_depend>gazebo_plugins</run_depend>
-  <run_depend>gazebo</run_depend>
-  <run_depend>roboticsgroup_gazebo_plugins</run_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <run_depend>sciurus17_moveit_config</run_depend>
-  <run_depend>sciurus17_control</run_depend>
-  <run_depend>sciurus17_description</run_depend>
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <depend>controller_manager</depend>
+  <depend>gripper_controllers</depend>
+  <depend>ros2_controllers</depend>
+  <depend>ros_gz</depend>
+  <depend>robot_state_publisher</depend>
 
   <export>
+    <build_type>ament_cmake</build_type>
     <gazebo_ros gazebo_media_path="${prefix}" gazebo_model_path="${prefix}/models"/>
   </export>
 </package>
