@@ -32,6 +32,7 @@ ROS 2で[Sciurus17](https://www.rt-net.jp/products/sciurus17)を動作させる�
         <li><a href="#シミュレータの実行方法">シミュレータの実行方法</a></li>
       </ul>
     </li>
+    <li><a href="#オプション構成要素">オプション構成要素</a></li>
     <li>
       <a href="#ベース構成">ベース構成</a>
       <ul>
@@ -206,6 +207,39 @@ ros2 launch sciurus17_gazebo sciurus17_gazebo.launch.py use_kachaka_base:=true
 
 固定ベース構成ではロボットはテーブル上に出現します。カチャカベースの場合はテーブルの横の床面に
 出現し、`wheel_controller`（`diff_drive_controller`）が速度指令を受け付けます。
+
+<p align="right">(<a href="#readme-top">上に戻る</a>)</p>
+
+## オプション構成要素
+
+頭部、左右の腕、左右のグリッパは個別に取り外せます。組み立て途中のSciurus17でも
+同じパッケージで動かせます。いずれもデフォルトは`true`です。
+
+| 引数 | 構成要素 |
+| --- | --- |
+| `enable_head` | 首のジョイントとヘッドカメラの座標系 |
+| `enable_arm_right` | 右腕（およびそのグリッパ） |
+| `enable_arm_left` | 左腕（およびそのグリッパ） |
+| `enable_gripper_right` | 右グリッパのみ（腕は残す） |
+| `enable_gripper_left` | 左グリッパのみ（腕は残す） |
+
+```sh
+# 左腕とグリッパのみ（頭部と右腕なし）
+ros2 launch sciurus17_examples demo.launch.py \
+    enable_head:=false enable_arm_right:=false
+```
+
+無効にした構成要素は、URDFのリンクとジョイント、`ros2_control`のジョイント、
+SRDFのプランニンググループ、launchファイルのコントローラからそれぞれ取り除かれます。
+存在しないハードウェアを参照するものは残りません。
+
+> [!IMPORTANT]
+> これらの引数は最上位のlaunchファイルに渡してください。ロボットの記述、MoveIt、
+> コントローラへ転送され、3者が同じ構成を参照する必要があります。
+
+> [!NOTE]
+> グリッパは腕の手首に取り付くため、腕なしでは成立しません。`enable_arm_right:=false`は
+> 右グリッパも取り除きます。腕が無効な状態でグリッパだけを有効にしても効果はありません。
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
