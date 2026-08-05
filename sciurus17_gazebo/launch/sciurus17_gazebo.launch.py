@@ -42,6 +42,14 @@ def generate_launch_description():
         'use_kachaka_base', default_value='false', description='Enable Kachaka mobile base.'
     )
 
+    component_args = ['enable_head', 'enable_arm_right', 'enable_arm_left',
+                      'enable_gripper_right', 'enable_gripper_left']
+
+    declare_components = [
+        DeclareLaunchArgument(name, default_value='true', description='Build this component.')
+        for name in component_args
+    ]
+
     declare_world_name = DeclareLaunchArgument(
         'world_name',
         default_value=os.path.join(
@@ -110,6 +118,8 @@ def generate_launch_description():
     description_loader.use_gazebo_head_camera = LaunchConfiguration('use_head_camera')
     description_loader.use_gazebo_chest_camera = LaunchConfiguration('use_chest_camera')
     description_loader.use_kachaka_base = LaunchConfiguration('use_kachaka_base')
+    for name in component_args:
+        setattr(description_loader, name, LaunchConfiguration(name))
     description_loader.gz_control_config_package = 'sciurus17_control'
     description_loader.gz_control_config_file_path = 'config/sciurus17_controllers.yaml'
     description = description_loader.load()
@@ -135,6 +145,7 @@ def generate_launch_description():
             'gz_control_config_package': 'sciurus17_control',
             'gz_control_config_file_path': 'config/sciurus17_controllers.yaml',
             'use_kachaka_base': LaunchConfiguration('use_kachaka_base'),
+            **{name: LaunchConfiguration(name) for name in component_args},
         }.items(),
     )
 
@@ -150,6 +161,7 @@ def generate_launch_description():
         executable='spawner',
         output='screen',
         arguments=['right_arm_controller'],
+        condition=IfCondition(LaunchConfiguration('enable_arm_right')),
     )
 
     spawn_right_gripper_controller = Node(
@@ -157,6 +169,7 @@ def generate_launch_description():
         executable='spawner',
         output='screen',
         arguments=['right_gripper_controller'],
+        condition=IfCondition(LaunchConfiguration('enable_gripper_right')),
     )
 
     spawn_left_arm_controller = Node(
@@ -164,6 +177,7 @@ def generate_launch_description():
         executable='spawner',
         output='screen',
         arguments=['left_arm_controller'],
+        condition=IfCondition(LaunchConfiguration('enable_arm_left')),
     )
 
     spawn_left_gripper_controller = Node(
@@ -171,6 +185,7 @@ def generate_launch_description():
         executable='spawner',
         output='screen',
         arguments=['left_gripper_controller'],
+        condition=IfCondition(LaunchConfiguration('enable_gripper_left')),
     )
 
     spawn_neck_controller = Node(
@@ -178,6 +193,7 @@ def generate_launch_description():
         executable='spawner',
         output='screen',
         arguments=['neck_controller'],
+        condition=IfCondition(LaunchConfiguration('enable_head')),
     )
 
     spawn_waist_yaw_controller = Node(
@@ -213,6 +229,7 @@ def generate_launch_description():
             declare_use_chest_camera,
             declare_world_name,
             declare_use_kachaka_base,
+            *declare_components,
             gz_sim,
             robot_state_publisher,
             gz_sim_spawn_entity,
