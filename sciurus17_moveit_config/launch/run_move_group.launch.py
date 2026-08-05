@@ -3,6 +3,8 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
+from launch.actions import GroupAction
+from launch.conditions import UnlessCondition
 from launch.substitutions import LaunchConfiguration
 from moveit_configs_utils import MoveItConfigsBuilder
 from moveit_configs_utils.launches import generate_move_group_launch
@@ -77,6 +79,12 @@ def generate_launch_description():
         description='Set gz control config file path.'
     )
 
+    declare_use_kachaka_base = DeclareLaunchArgument(
+        'use_kachaka_base',
+        default_value='false',
+        description='Enable Kachaka mobile base.'
+    )
+
     description_loader = RobotDescriptionLoader()
     description_loader.port_name = LaunchConfiguration('port_name')
     description_loader.baudrate = LaunchConfiguration('baudrate')
@@ -92,10 +100,14 @@ def generate_launch_description():
     description_loader.manipulator_config_file_path = LaunchConfiguration(
         'manipulator_config_file_path'
     )
+    description_loader.use_kachaka_base = LaunchConfiguration('use_kachaka_base')
     loaded_description = description_loader.load()
 
     moveit_config = (
         MoveItConfigsBuilder('sciurus17')
+        .robot_description_semantic(
+            mappings={'use_kachaka_base': LaunchConfiguration('use_kachaka_base')}
+        )
         .planning_scene_monitor(
             publish_robot_description=False,
             publish_robot_description_semantic=True,
@@ -118,8 +130,15 @@ def generate_launch_description():
             declare_use_mock_components,
             declare_gz_control_config_package,
             declare_gz_control_config_file_path,
+            declare_use_kachaka_base,
             generate_move_group_launch(moveit_config),
             generate_moveit_rviz_launch(moveit_config),
-            generate_static_virtual_joint_tfs_launch(moveit_config),
+            # Only the fixed base needs this. It publishes a static transform for the
+            # SRDF virtual joint, which with the Kachaka base is the moving
+            # odom -> base_footprint transform that wheel_controller already publishes.
+            GroupAction(
+                [generate_static_virtual_joint_tfs_launch(moveit_config)],
+                condition=UnlessCondition(LaunchConfiguration('use_kachaka_base')),
+            ),
         ]
     )
