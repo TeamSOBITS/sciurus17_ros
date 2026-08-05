@@ -109,10 +109,17 @@ Hardware:
     ```
 
 > [!NOTE]
-> `install.sh` clones `sciurus17_description`, `sciurus17_kachaka_description` and
-> `kachaka-api` next to this repository. `sciurus17_kachaka_description` is a
-> private repository, so you need access to the TeamSOBITS organization to
-> clone it. It is only required for the Kachaka configuration.
+> `install.sh` clones `sciurus17_description`, `sciurus17_kachaka_description`,
+> `kachaka-api` and `realsense_ros` next to this repository.
+> `sciurus17_kachaka_description` is a private repository, so you need access to
+> the TeamSOBITS organization to clone it. It is only required for the Kachaka
+> configuration.
+
+> [!IMPORTANT]
+> `realsense_ros` is built from source rather than installed from apt, because
+> its own `install.sh` also builds `librealsense2` and installs the udev rules
+> that the head and hand cameras need in order to be detected. This step compiles
+> `librealsense2`, so the first run of `install.sh` takes a while.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
