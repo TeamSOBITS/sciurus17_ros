@@ -17,6 +17,7 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
+from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from sciurus17_description.robot_description_loader import RobotDescriptionLoader
@@ -98,6 +99,12 @@ def generate_launch_description():
         description='Set gz control config file path.'
     )
 
+    declare_use_kachaka_base = DeclareLaunchArgument(
+        'use_kachaka_base',
+        default_value='false',
+        description='Enable Kachaka mobile base.'
+    )
+
     description_loader = RobotDescriptionLoader()
     description_loader.port_name = LaunchConfiguration('port_name')
     description_loader.baudrate = LaunchConfiguration('baudrate')
@@ -114,6 +121,7 @@ def generate_launch_description():
     description_loader.manipulator_config_file_path = LaunchConfiguration(
         'manipulator_config_file_path'
     )
+    description_loader.use_kachaka_base = LaunchConfiguration('use_kachaka_base')
     loaded_description = description_loader.load()
 
     robot_state_publisher = Node(
@@ -179,6 +187,14 @@ def generate_launch_description():
         arguments=['waist_yaw_controller'],
     )
 
+    spawn_wheel_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        output='screen',
+        arguments=['wheel_controller'],
+        condition=IfCondition(LaunchConfiguration('use_kachaka_base')),
+    )
+
     return LaunchDescription(
         [
             declare_port_name,
@@ -192,6 +208,7 @@ def generate_launch_description():
             declare_use_isaacsim,
             declare_gz_control_config_package,
             declare_gz_control_config_file_path,
+            declare_use_kachaka_base,
             robot_state_publisher,
             controller_manager,
             spawn_right_arm_controller,
@@ -201,5 +218,6 @@ def generate_launch_description():
             spawn_joint_state_broadcaster,
             spawn_neck_controller,
             spawn_waist_yaw_controller,
+            spawn_wheel_controller,
         ]
     )
