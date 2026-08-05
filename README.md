@@ -32,6 +32,7 @@ turn it into a mobile manipulator.
         <li><a href="#running-the-simulator">Running the simulator</a></li>
       </ul>
     </li>
+    <li><a href="#optional-components">Optional Components</a></li>
     <li>
       <a href="#base-configurations">Base Configurations</a>
       <ul>
@@ -212,6 +213,42 @@ ros2 launch sciurus17_gazebo sciurus17_gazebo.launch.py use_kachaka_base:=true
 In the fixed-base configuration the robot is spawned on the table. With the
 Kachaka base it is spawned on the floor beside it, and `wheel_controller`
 (a `diff_drive_controller`) accepts velocity commands.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Optional Components
+
+The head, each arm and each gripper can be left out of the robot, so the same
+packages can drive a partially assembled Sciurus17. Every component defaults to
+`true`.
+
+| Argument | Component |
+| --- | --- |
+| `enable_head` | Neck joints and the head camera frames |
+| `enable_arm_right` | Right arm (and its gripper) |
+| `enable_arm_left` | Left arm (and its gripper) |
+| `enable_gripper_right` | Right gripper only, keeping the arm |
+| `enable_gripper_left` | Left gripper only, keeping the arm |
+
+```sh
+# A left arm and gripper only, no head and no right arm
+ros2 launch sciurus17_examples demo.launch.py \
+    enable_head:=false enable_arm_right:=false
+```
+
+Disabling a component removes its links and joints from the URDF, its joints
+from `ros2_control`, its planning groups from the SRDF, and its controller from
+the launch files, so nothing is left referring to hardware that is not there.
+
+> [!IMPORTANT]
+> Pass these to the top-level launch file. They are forwarded to the robot
+> description, MoveIt and the controllers, which must all agree on which
+> components exist.
+
+> [!NOTE]
+> A gripper needs its arm, since it mounts on the arm's wrist. Setting
+> `enable_arm_right:=false` therefore also removes the right gripper, and
+> requesting a gripper whose arm is disabled has no effect.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
