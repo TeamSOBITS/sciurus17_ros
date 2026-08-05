@@ -3,7 +3,7 @@ moveit_setup_assistant_config:
     package: sciurus17_description
     relative_path: urdf/sciurus17.urdf.xacro
   srdf:
-    relative_path: config/sciurus17.srdf
+    relative_path: config/sciurus17.srdf.xacro
   package_settings:
     author_name: Atsushi Kuwagata
     author_email: kuwagata@rt-net.jp
