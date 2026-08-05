@@ -3,13 +3,11 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.actions import GroupAction
-from launch.conditions import UnlessCondition
 from launch.substitutions import LaunchConfiguration
+from launch_ros.parameter_descriptions import ParameterValue
 from moveit_configs_utils import MoveItConfigsBuilder
 from moveit_configs_utils.launches import generate_move_group_launch
 from moveit_configs_utils.launches import generate_moveit_rviz_launch
-from moveit_configs_utils.launches import generate_static_virtual_joint_tfs_launch
 from sciurus17_description.robot_description_loader import RobotDescriptionLoader
 
 
@@ -116,7 +114,9 @@ def generate_launch_description():
         .to_moveit_configs()
     )
 
-    moveit_config.robot_description = {'robot_description': loaded_description}
+    moveit_config.robot_description = {
+        'robot_description': ParameterValue(loaded_description, value_type=str)
+    }
 
     return LaunchDescription(
         [
@@ -133,12 +133,11 @@ def generate_launch_description():
             declare_use_kachaka_base,
             generate_move_group_launch(moveit_config),
             generate_moveit_rviz_launch(moveit_config),
-            # Only the fixed base needs this. It publishes a static transform for the
-            # SRDF virtual joint, which with the Kachaka base is the moving
-            # odom -> base_footprint transform that wheel_controller already publishes.
-            GroupAction(
-                [generate_static_virtual_joint_tfs_launch(moveit_config)],
-                condition=UnlessCondition(LaunchConfiguration('use_kachaka_base')),
-            ),
+            # generate_static_virtual_joint_tfs_launch() is intentionally not used here.
+            # It parses the SRDF while the launch file is being loaded, which is not
+            # possible once the SRDF is generated from a xacro argument. It is also
+            # unnecessary: in fixed-base mode the URDF declares world -> body_base_link
+            # as a real joint that robot_state_publisher publishes, and with the Kachaka
+            # base odom -> base_footprint comes from wheel_controller odometry.
         ]
     )
