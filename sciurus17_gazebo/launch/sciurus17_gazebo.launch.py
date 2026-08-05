@@ -25,6 +25,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.actions import SetParameter
+from launch_ros.parameter_descriptions import ParameterValue
 from sciurus17_description.robot_description_loader import RobotDescriptionLoader
 
 
@@ -116,7 +117,7 @@ def generate_launch_description():
     robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
-        parameters=[{'robot_description': description}],
+        parameters=[{'robot_description': ParameterValue(description, value_type=str)}],
         output='screen'
     )
 
