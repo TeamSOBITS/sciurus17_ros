@@ -9,31 +9,35 @@ echo "╔══╣ Setup: SCIURUS17 KACHAKA (STARTING) ╠══╗"
 DIR=`pwd`
 cd ..
 
-# Download required packages for SCIURUS17 KACHAKA
+# Download required packages for SCIURUS17 KACHAKA.
+# The branch naming differs per repository, so each entry carries its own branch.
 ros_packages=(
-    "sciurus17_description"
-    "sciurus17_kachaka_description"
-    "kachaka-api"
+    "sciurus17_description:$ROS_DISTRO"
+    "sciurus17_kachaka_description:$ROS_DISTRO"
+    "kachaka-api:$ROS_DISTRO-devel"
 )
 
 # Clone all packages
 for ((i = 0; i < ${#ros_packages[@]}; i++)) {
-    if [ -d ${ros_packages[i]} ]; then
-        echo "${ros_packages[i]} already exists, skipping clone."
+    package=${ros_packages[i]%%:*}
+    branch=${ros_packages[i]##*:}
+
+    if [ -d ${package} ]; then
+        echo "${package} already exists, skipping clone."
     else
-        echo "Cloning: ${ros_packages[i]}"
-        git clone -b $ROS_DISTRO https://github.com/TeamSOBITS/${ros_packages[i]}.git
+        echo "Cloning: ${package} (${branch})"
+        git clone -b ${branch} https://github.com/TeamSOBITS/${package}.git
     fi
 
     # Check if install.sh exists in each package
-    if [ -f ${ros_packages[i]}/install.sh ]; then
-        echo "Running install.sh in ${ros_packages[i]}."
-        cd ${ros_packages[i]}
+    if [ -f ${package}/install.sh ]; then
+        echo "Running install.sh in ${package}."
+        cd ${package}
         bash install.sh
         cd ..
     fi
     # If kachaka-api, delete kachaka_grpc_ros2_bridge
-    if [ ${ros_packages[i]} == "kachaka-api" ]; then
+    if [ ${package} == "kachaka-api" ]; then
         echo "Deleting kachaka_grpc_ros2_bridge"
         rm -rf kachaka-api/ros2/kachaka_grpc_ros2_bridge
     fi
