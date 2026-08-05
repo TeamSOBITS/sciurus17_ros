@@ -37,6 +37,10 @@ def generate_launch_description():
         description=('Set true when using the simulator.'),
     )
 
+    declare_use_kachaka_base = DeclareLaunchArgument(
+        'use_kachaka_base', default_value='false', description='Enable Kachaka mobile base.'
+    )
+
     move_group = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [
@@ -44,6 +48,9 @@ def generate_launch_description():
                 '/launch/run_move_group.launch.py',
             ]
         ),
+        launch_arguments={
+            'use_kachaka_base': LaunchConfiguration('use_kachaka_base'),
+        }.items(),
     )
 
     control_node = IncludeLaunchDescription(
@@ -53,6 +60,9 @@ def generate_launch_description():
                 '/launch/sciurus17_control.launch.py',
             ]
         ),
+        launch_arguments={
+            'use_kachaka_base': LaunchConfiguration('use_kachaka_base'),
+        }.items(),
     )
 
     head_camera_node = IncludeLaunchDescription(
@@ -75,6 +85,7 @@ def generate_launch_description():
             SetParameter(name='use_sim_time', value=LaunchConfiguration('use_sim_time')),
             declare_use_head_camera,
             declare_use_chest_camera,
+            declare_use_kachaka_base,
             move_group,
             control_node,
             head_camera_node,
