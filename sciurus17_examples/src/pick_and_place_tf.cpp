@@ -112,11 +112,11 @@ private:
 
     try {
       tf_msg = tf_buffer_->lookupTransform(
-        "base_link", "target_0",
+        "body_base_link", "target_0",
         tf2::TimePointZero);
     } catch (const tf2::TransformException & ex) {
       RCLCPP_INFO(
-        this->get_logger(), "Could not transform base_link to target: %s",
+        this->get_logger(), "Could not transform body_base_link to target: %s",
         ex.what());
       return;
     }
