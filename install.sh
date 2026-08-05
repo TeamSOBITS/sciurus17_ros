@@ -9,27 +9,25 @@ echo "╔══╣ Setup: SCIURUS17 KACHAKA (STARTING) ╠══╗"
 DIR=`pwd`
 cd ..
 
-# Download required packages for SCIURUS17 KACHAKA.
-# The branch naming differs per repository, so each entry carries its own branch.
+# Download required packages for SCIURUS17 KACHAKA
 ros_packages=(
-    "sciurus17_description:$ROS_DISTRO"
-    "sciurus17_kachaka_description:$ROS_DISTRO"
-    "kachaka-api:$ROS_DISTRO-devel"
+    "sciurus17_description"
+    "sciurus17_kachaka_description"
+    "kachaka-api"
     # Built from source rather than installed from apt: its install.sh also builds
     # librealsense2 and installs the udev rules the head and hand cameras need.
-    "realsense_ros:$ROS_DISTRO-devel"
+    "realsense_ros"
 )
 
 # Clone all packages
 for ((i = 0; i < ${#ros_packages[@]}; i++)) {
-    package=${ros_packages[i]%%:*}
-    branch=${ros_packages[i]##*:}
+    package=${ros_packages[i]}
 
     if [ -d ${package} ]; then
         echo "${package} already exists, skipping clone."
     else
-        echo "Cloning: ${package} (${branch})"
-        git clone -b ${branch} https://github.com/TeamSOBITS/${package}.git
+        echo "Cloning: ${package}"
+        git clone -b $ROS_DISTRO-devel https://github.com/TeamSOBITS/${package}.git
     fi
 
     # Check if install.sh exists in each package
