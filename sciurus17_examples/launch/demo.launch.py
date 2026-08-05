@@ -41,6 +41,14 @@ def generate_launch_description():
         'use_kachaka_base', default_value='false', description='Enable Kachaka mobile base.'
     )
 
+    component_args = ['enable_head', 'enable_arm_right', 'enable_arm_left',
+                      'enable_gripper_right', 'enable_gripper_left']
+
+    declare_components = [
+        DeclareLaunchArgument(name, default_value='true', description='Build this component.')
+        for name in component_args
+    ]
+
     move_group = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [
@@ -50,6 +58,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             'use_kachaka_base': LaunchConfiguration('use_kachaka_base'),
+            **{name: LaunchConfiguration(name) for name in component_args},
         }.items(),
     )
 
@@ -62,6 +71,7 @@ def generate_launch_description():
         ),
         launch_arguments={
             'use_kachaka_base': LaunchConfiguration('use_kachaka_base'),
+            **{name: LaunchConfiguration(name) for name in component_args},
         }.items(),
     )
 
@@ -86,6 +96,7 @@ def generate_launch_description():
             declare_use_head_camera,
             declare_use_chest_camera,
             declare_use_kachaka_base,
+            *declare_components,
             move_group,
             control_node,
             head_camera_node,
