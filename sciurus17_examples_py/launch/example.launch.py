@@ -17,6 +17,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from moveit_configs_utils import MoveItConfigsBuilder
 from sciurus17_description.robot_description_loader import RobotDescriptionLoader
 
@@ -38,10 +39,18 @@ def generate_launch_description():
         description=('Set true when using the gazebo simulator.'),
     )
 
+    declare_use_kachaka_base = DeclareLaunchArgument(
+        'use_kachaka_base', default_value='false', description='Enable Kachaka mobile base.'
+    )
+
     description_loader = RobotDescriptionLoader()
+    description_loader.use_kachaka_base = LaunchConfiguration('use_kachaka_base')
 
     moveit_config = (
         MoveItConfigsBuilder('sciurus17')
+        .robot_description_semantic(
+            mappings={'use_kachaka_base': LaunchConfiguration('use_kachaka_base')}
+        )
         .moveit_cpp(
             file_path=get_package_share_directory('sciurus17_examples_py')
             + '/config/sciurus17_moveit_py_examples.yaml'
@@ -49,7 +58,7 @@ def generate_launch_description():
         .to_moveit_configs()
     )
     moveit_config.robot_description = {
-        'robot_description': description_loader.load()
+        'robot_description': ParameterValue(description_loader.load(), value_type=str)
     }
     moveit_config.move_group_capabilities = {'capabilities': ''}
 
@@ -70,6 +79,7 @@ def generate_launch_description():
         [
             declare_use_sim_time,
             declare_example_name,
+            declare_use_kachaka_base,
             example_node,
         ]
     )
