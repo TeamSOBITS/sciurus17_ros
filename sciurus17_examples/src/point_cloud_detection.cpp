@@ -82,17 +82,17 @@ private:
 
     try {
       tf_msg = tf_buffer_->lookupTransform(
-        "base_link", msg->header.frame_id,
+        "body_base_link", msg->header.frame_id,
         tf2::TimePointZero);
     } catch (const tf2::TransformException & ex) {
       RCLCPP_INFO(
-        this->get_logger(), "Could not transform base_link to camera_depth_optical_frame: %s",
+        this->get_logger(), "Could not transform body_base_link to camera_depth_optical_frame: %s",
         ex.what());
       return;
     }
 
     sensor_msgs::msg::PointCloud2 cloud_transformed;
-    pcl_ros::transformPointCloud("base_link", tf_msg, *msg, cloud_transformed);
+    pcl_ros::transformPointCloud("body_base_link", tf_msg, *msg, cloud_transformed);
 
     // ROSメッセージの点群フォーマットからPCLのフォーマットに変換
     auto cloud = std::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
