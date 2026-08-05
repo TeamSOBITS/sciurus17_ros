@@ -15,6 +15,9 @@ ros_packages=(
     "sciurus17_description:$ROS_DISTRO"
     "sciurus17_kachaka_description:$ROS_DISTRO"
     "kachaka-api:$ROS_DISTRO-devel"
+    # Built from source rather than installed from apt: its install.sh also builds
+    # librealsense2 and installs the udev rules the head and hand cameras need.
+    "realsense_ros:$ROS_DISTRO-devel"
 )
 
 # Clone all packages
@@ -59,16 +62,22 @@ sudo apt-get install -y \
     ros-$ROS_DISTRO-joint-state-publisher \
     ros-$ROS_DISTRO-joint-state-publisher-gui \
     ros-$ROS_DISTRO-gripper-controllers \
+    ros-$ROS_DISTRO-parallel-gripper-controller \
     ros-$ROS_DISTRO-diff-drive-controller \
     ros-$ROS_DISTRO-robot-state-publisher \
     ros-$ROS_DISTRO-xacro \
     ros-$ROS_DISTRO-urdf \
     ros-$ROS_DISTRO-angles \
     ros-$ROS_DISTRO-pluginlib \
+    ros-$ROS_DISTRO-launch \
+    ros-$ROS_DISTRO-rclcpp \
+    ros-$ROS_DISTRO-rclcpp-components \
+    ros-$ROS_DISTRO-rclpy \
     ros-$ROS_DISTRO-std-msgs \
     ros-$ROS_DISTRO-geometry-msgs \
     ros-$ROS_DISTRO-sensor-msgs \
     ros-$ROS_DISTRO-trajectory-msgs \
+    ros-$ROS_DISTRO-message-filters \
     ros-$ROS_DISTRO-tf2 \
     ros-$ROS_DISTRO-tf2-ros \
     ros-$ROS_DISTRO-tf2-geometry-msgs \
@@ -89,21 +98,37 @@ sudo apt-get install -y \
     ros-$ROS_DISTRO-moveit-setup-assistant \
     ros-$ROS_DISTRO-moveit-simple-controller-manager
 
-# Download vision packages
+# Download vision packages.
+# realsense2_camera is not installed here: it is built from the realsense_ros
+# source checkout above, together with librealsense2 and its udev rules.
 sudo apt-get install -y \
     libpcl-dev \
     libopencv-dev \
+    python3-numpy \
+    python3-opencv \
+    python3-scipy \
     ros-$ROS_DISTRO-pcl-ros \
     ros-$ROS_DISTRO-cv-bridge \
     ros-$ROS_DISTRO-image-geometry \
-    ros-$ROS_DISTRO-usb-cam \
-    ros-$ROS_DISTRO-realsense2-camera
+    ros-$ROS_DISTRO-image-transport \
+    ros-$ROS_DISTRO-usb-cam
 
 # Install Gazebo Harmonic with binaries
 sudo apt-get install -y \
     ros-$ROS_DISTRO-ros-gz \
     ros-$ROS_DISTRO-gz-ros2-control \
     ros-$ROS_DISTRO-topic-tools
+
+# Build and test tooling
+sudo apt-get install -y \
+    python3-pytest \
+    ros-$ROS_DISTRO-ament-cmake \
+    ros-$ROS_DISTRO-ament-cmake-pytest \
+    ros-$ROS_DISTRO-ament-lint-auto \
+    ros-$ROS_DISTRO-ament-lint-common \
+    ros-$ROS_DISTRO-ament-copyright \
+    ros-$ROS_DISTRO-ament-flake8 \
+    ros-$ROS_DISTRO-ament-pep257
 
 # Install the remaining declared dependencies
 rosdep install -r -y -i --from-paths .
