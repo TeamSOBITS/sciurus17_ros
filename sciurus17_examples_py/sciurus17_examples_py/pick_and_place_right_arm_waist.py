@@ -105,7 +105,7 @@ def main(args=None):
     r_arm_waist.set_path_constraints(path_constraints=constraints)
     r_arm_waist.set_start_state_to_current_state()
     goal_pose = PoseStamped()
-    goal_pose.header.frame_id = 'base_link'
+    goal_pose.header.frame_id = 'body_base_link'
     goal_pose.pose = PRE_AND_POST_GRASP_POSE
     r_arm_waist.set_goal_state(pose_stamped_msg=goal_pose, pose_link='r_link7')
     plan_and_execute(
@@ -118,7 +118,7 @@ def main(args=None):
     # 掴みに行く
     r_arm_waist.set_start_state_to_current_state()
     goal_pose = PoseStamped()
-    goal_pose.header.frame_id = 'base_link'
+    goal_pose.header.frame_id = 'body_base_link'
     goal_pose.pose = GRASP_POSE
     r_arm_waist.set_goal_state(pose_stamped_msg=goal_pose, pose_link='r_link7')
     plan_and_execute(
@@ -143,7 +143,7 @@ def main(args=None):
     # 持ち上げる
     r_arm_waist.set_start_state_to_current_state()
     goal_pose = PoseStamped()
-    goal_pose.header.frame_id = 'base_link'
+    goal_pose.header.frame_id = 'body_base_link'
     goal_pose.pose = PRE_AND_POST_GRASP_POSE
     r_arm_waist.set_goal_state(pose_stamped_msg=goal_pose, pose_link='r_link7')
     plan_and_execute(
@@ -156,7 +156,7 @@ def main(args=None):
     # 移動する
     r_arm_waist.set_start_state_to_current_state()
     goal_pose = PoseStamped()
-    goal_pose.header.frame_id = 'base_link'
+    goal_pose.header.frame_id = 'body_base_link'
     goal_pose.pose = PRE_AND_POST_RELEASE_POSE
     r_arm_waist.set_goal_state(pose_stamped_msg=goal_pose, pose_link='r_link7')
     plan_and_execute(
@@ -169,7 +169,7 @@ def main(args=None):
     # 下ろす
     r_arm_waist.set_start_state_to_current_state()
     goal_pose = PoseStamped()
-    goal_pose.header.frame_id = 'base_link'
+    goal_pose.header.frame_id = 'body_base_link'
     goal_pose.pose = RELEASE_POSE
     r_arm_waist.set_goal_state(pose_stamped_msg=goal_pose, pose_link='r_link7')
     plan_and_execute(
@@ -194,7 +194,7 @@ def main(args=None):
     # ハンドを持ち上げる
     r_arm_waist.set_start_state_to_current_state()
     goal_pose = PoseStamped()
-    goal_pose.header.frame_id = 'base_link'
+    goal_pose.header.frame_id = 'body_base_link'
     goal_pose.pose = PRE_AND_POST_RELEASE_POSE
     r_arm_waist.set_goal_state(pose_stamped_msg=goal_pose, pose_link='r_link7')
     plan_and_execute(
