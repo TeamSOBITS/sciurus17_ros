@@ -5,149 +5,196 @@
 -->
 <robot name="sciurus17" xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:arg name="use_kachaka_base" default="false"/>
+    <!-- Activate components. These must match the values the URDF was built with,
+         otherwise MoveIt would advertise groups whose joints do not exist. -->
+    <xacro:arg name="enable_head" default="true"/>
+    <xacro:arg name="enable_arm_right" default="true"/>
+    <xacro:arg name="enable_arm_left" default="true"/>
+    <xacro:arg name="enable_gripper_right" default="true"/>
+    <xacro:arg name="enable_gripper_left" default="true"/>
+    <xacro:property name="ENABLE_HEAD" value="${'$(arg enable_head)'.lower() == 'true'}"/>
+    <xacro:property name="ENABLE_ARM_R" value="${'$(arg enable_arm_right)'.lower() == 'true'}"/>
+    <xacro:property name="ENABLE_ARM_L" value="${'$(arg enable_arm_left)'.lower() == 'true'}"/>
+    <xacro:property name="ENABLE_GRIPPER_R" value="${'$(arg enable_gripper_right)'.lower() == 'true' and ENABLE_ARM_R}"/>
+    <xacro:property name="ENABLE_GRIPPER_L" value="${'$(arg enable_gripper_left)'.lower() == 'true' and ENABLE_ARM_L}"/>
+    <xacro:property name="ENABLE_TWO_ARM" value="${ENABLE_ARM_R and ENABLE_ARM_L}"/>
     <!--GROUPS: Representation of a set of joints and links. This can be useful for specifying DOF to plan for, defining arms, end effectors, etc-->
     <!--LINKS: When a link is specified, the parent joint of that link (if it exists) is automatically included-->
     <!--JOINTS: When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
     <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
     <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
-    <group name="r_arm_group">
-        <joint name="r_arm_joint1"/>
-        <joint name="r_arm_joint2"/>
-        <joint name="r_arm_joint3"/>
-        <joint name="r_arm_joint4"/>
-        <joint name="r_arm_joint5"/>
-        <joint name="r_arm_joint6"/>
-        <joint name="r_arm_joint7"/>
-    </group>
-    <group name="r_gripper_group">
-        <link name="r_gripperA_link"/>
-        <link name="r_gripperB_link"/>
-    </group>
-    <group name="l_arm_group">
-        <joint name="l_arm_joint1"/>
-        <joint name="l_arm_joint2"/>
-        <joint name="l_arm_joint3"/>
-        <joint name="l_arm_joint4"/>
-        <joint name="l_arm_joint5"/>
-        <joint name="l_arm_joint6"/>
-        <joint name="l_arm_joint7"/>
-    </group>
-    <group name="r_arm_waist_group">
-        <joint name="waist_yaw_joint"/>
-        <joint name="r_arm_joint1"/>
-        <joint name="r_arm_joint2"/>
-        <joint name="r_arm_joint3"/>
-        <joint name="r_arm_joint4"/>
-        <joint name="r_arm_joint5"/>
-        <joint name="r_arm_joint6"/>
-        <joint name="r_arm_joint7"/>
-    </group>
-    <group name="l_arm_waist_group">
-        <joint name="waist_yaw_joint"/>
-        <joint name="l_arm_joint1"/>
-        <joint name="l_arm_joint2"/>
-        <joint name="l_arm_joint3"/>
-        <joint name="l_arm_joint4"/>
-        <joint name="l_arm_joint5"/>
-        <joint name="l_arm_joint6"/>
-        <joint name="l_arm_joint7"/>
-    </group>
-    <group name="l_gripper_group">
-        <link name="l_gripperA_link"/>
-        <link name="l_gripperB_link"/>
-    </group>
-    <group name="two_arm_group">
-        <group name="r_arm_group"/>
-        <group name="l_arm_group"/>
-    </group>
-    <group name="neck_group">
-        <joint name="neck_yaw_joint"/>
-        <joint name="neck_pitch_joint"/>
-    </group>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <group name="r_arm_group">
+            <joint name="r_arm_joint1"/>
+            <joint name="r_arm_joint2"/>
+            <joint name="r_arm_joint3"/>
+            <joint name="r_arm_joint4"/>
+            <joint name="r_arm_joint5"/>
+            <joint name="r_arm_joint6"/>
+            <joint name="r_arm_joint7"/>
+        </group>
+    </xacro:if>
+    <xacro:if value="${ENABLE_GRIPPER_R}">
+        <group name="r_gripper_group">
+            <link name="r_gripperA_link"/>
+            <link name="r_gripperB_link"/>
+        </group>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <group name="l_arm_group">
+            <joint name="l_arm_joint1"/>
+            <joint name="l_arm_joint2"/>
+            <joint name="l_arm_joint3"/>
+            <joint name="l_arm_joint4"/>
+            <joint name="l_arm_joint5"/>
+            <joint name="l_arm_joint6"/>
+            <joint name="l_arm_joint7"/>
+        </group>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <group name="r_arm_waist_group">
+            <joint name="waist_yaw_joint"/>
+            <joint name="r_arm_joint1"/>
+            <joint name="r_arm_joint2"/>
+            <joint name="r_arm_joint3"/>
+            <joint name="r_arm_joint4"/>
+            <joint name="r_arm_joint5"/>
+            <joint name="r_arm_joint6"/>
+            <joint name="r_arm_joint7"/>
+        </group>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <group name="l_arm_waist_group">
+            <joint name="waist_yaw_joint"/>
+            <joint name="l_arm_joint1"/>
+            <joint name="l_arm_joint2"/>
+            <joint name="l_arm_joint3"/>
+            <joint name="l_arm_joint4"/>
+            <joint name="l_arm_joint5"/>
+            <joint name="l_arm_joint6"/>
+            <joint name="l_arm_joint7"/>
+        </group>
+    </xacro:if>
+    <xacro:if value="${ENABLE_GRIPPER_L}">
+        <group name="l_gripper_group">
+            <link name="l_gripperA_link"/>
+            <link name="l_gripperB_link"/>
+        </group>
+    </xacro:if>
+    <xacro:if value="${ENABLE_TWO_ARM}">
+        <group name="two_arm_group">
+            <group name="r_arm_group"/>
+            <group name="l_arm_group"/>
+        </group>
+    </xacro:if>
+    <xacro:if value="${ENABLE_HEAD}">
+        <group name="neck_group">
+            <joint name="neck_yaw_joint"/>
+            <joint name="neck_pitch_joint"/>
+        </group>
+    </xacro:if>
     <group name="waist_group">
         <joint name="waist_yaw_joint"/>
     </group>
     <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
-    <group_state name="r_arm_init_pose" group="r_arm_group">
-        <joint name="r_arm_joint1" value="0"/>
-        <joint name="r_arm_joint2" value="-1.5707"/>
-        <joint name="r_arm_joint3" value="0"/>
-        <joint name="r_arm_joint4" value="2.7262"/>
-        <joint name="r_arm_joint5" value="0"/>
-        <joint name="r_arm_joint6" value="-2.0943"/>
-        <joint name="r_arm_joint7" value="0"/>
-    </group_state>
-    <group_state name="l_arm_init_pose" group="l_arm_group">
-        <joint name="l_arm_joint1" value="0"/>
-        <joint name="l_arm_joint2" value="1.5707"/>
-        <joint name="l_arm_joint3" value="0"/>
-        <joint name="l_arm_joint4" value="-2.7262"/>
-        <joint name="l_arm_joint5" value="0"/>
-        <joint name="l_arm_joint6" value="2.0943"/>
-        <joint name="l_arm_joint7" value="0"/>
-    </group_state>
-    <group_state name="r_arm_waist_init_pose" group="r_arm_waist_group">
-        <joint name="r_arm_joint1" value="0"/>
-        <joint name="r_arm_joint2" value="-1.5707"/>
-        <joint name="r_arm_joint3" value="0"/>
-        <joint name="r_arm_joint4" value="2.7262"/>
-        <joint name="r_arm_joint5" value="0"/>
-        <joint name="r_arm_joint6" value="-2.0943"/>
-        <joint name="r_arm_joint7" value="0"/>
-        <joint name="waist_yaw_joint" value="0"/>
-    </group_state>
-    <group_state name="l_arm_waist_init_pose" group="l_arm_waist_group">
-        <joint name="l_arm_joint1" value="0"/>
-        <joint name="l_arm_joint2" value="1.5707"/>
-        <joint name="l_arm_joint3" value="0"/>
-        <joint name="l_arm_joint4" value="-2.7262"/>
-        <joint name="l_arm_joint5" value="0"/>
-        <joint name="l_arm_joint6" value="2.0943"/>
-        <joint name="l_arm_joint7" value="0"/>
-        <joint name="waist_yaw_joint" value="0"/>
-    </group_state>
-    <group_state name="two_arm_init_pose" group="two_arm_group">
-        <joint name="l_arm_joint1" value="0"/>
-        <joint name="l_arm_joint2" value="1.5707"/>
-        <joint name="l_arm_joint3" value="0"/>
-        <joint name="l_arm_joint4" value="-2.7262"/>
-        <joint name="l_arm_joint5" value="0"/>
-        <joint name="l_arm_joint6" value="2.09439"/>
-        <joint name="l_arm_joint7" value="0"/>
-        <joint name="r_arm_joint1" value="0"/>
-        <joint name="r_arm_joint2" value="-1.5707"/>
-        <joint name="r_arm_joint3" value="0"/>
-        <joint name="r_arm_joint4" value="2.7262"/>
-        <joint name="r_arm_joint5" value="0"/>
-        <joint name="r_arm_joint6" value="-2.0943"/>
-        <joint name="r_arm_joint7" value="0"/>
-    </group_state>
-    <group_state name="two_arm_push_forward_pose" group="two_arm_group">
-        <joint name="l_arm_joint1" value="-0.5236"/>
-        <joint name="l_arm_joint2" value="1.5707"/>
-        <joint name="l_arm_joint3" value="0"/>
-        <joint name="l_arm_joint4" value="-2.0944"/>
-        <joint name="l_arm_joint5" value="0"/>
-        <joint name="l_arm_joint6" value="1.0472"/>
-        <joint name="l_arm_joint7" value="0"/>
-        <joint name="r_arm_joint1" value="0.5236"/>
-        <joint name="r_arm_joint2" value="-1.5707"/>
-        <joint name="r_arm_joint3" value="0"/>
-        <joint name="r_arm_joint4" value="2.0944"/>
-        <joint name="r_arm_joint5" value="0"/>
-        <joint name="r_arm_joint6" value="-1.0472"/>
-        <joint name="r_arm_joint7" value="0"/>
-    </group_state>
-    <group_state name="neck_init_pose" group="neck_group">
-        <joint name="neck_pitch_joint" value="0"/>
-        <joint name="neck_yaw_joint" value="0"/>
-    </group_state>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <group_state name="r_arm_init_pose" group="r_arm_group">
+            <joint name="r_arm_joint1" value="0"/>
+            <joint name="r_arm_joint2" value="-1.5707"/>
+            <joint name="r_arm_joint3" value="0"/>
+            <joint name="r_arm_joint4" value="2.7262"/>
+            <joint name="r_arm_joint5" value="0"/>
+            <joint name="r_arm_joint6" value="-2.0943"/>
+            <joint name="r_arm_joint7" value="0"/>
+        </group_state>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <group_state name="l_arm_init_pose" group="l_arm_group">
+            <joint name="l_arm_joint1" value="0"/>
+            <joint name="l_arm_joint2" value="1.5707"/>
+            <joint name="l_arm_joint3" value="0"/>
+            <joint name="l_arm_joint4" value="-2.7262"/>
+            <joint name="l_arm_joint5" value="0"/>
+            <joint name="l_arm_joint6" value="2.0943"/>
+            <joint name="l_arm_joint7" value="0"/>
+        </group_state>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <group_state name="r_arm_waist_init_pose" group="r_arm_waist_group">
+            <joint name="r_arm_joint1" value="0"/>
+            <joint name="r_arm_joint2" value="-1.5707"/>
+            <joint name="r_arm_joint3" value="0"/>
+            <joint name="r_arm_joint4" value="2.7262"/>
+            <joint name="r_arm_joint5" value="0"/>
+            <joint name="r_arm_joint6" value="-2.0943"/>
+            <joint name="r_arm_joint7" value="0"/>
+            <joint name="waist_yaw_joint" value="0"/>
+        </group_state>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <group_state name="l_arm_waist_init_pose" group="l_arm_waist_group">
+            <joint name="l_arm_joint1" value="0"/>
+            <joint name="l_arm_joint2" value="1.5707"/>
+            <joint name="l_arm_joint3" value="0"/>
+            <joint name="l_arm_joint4" value="-2.7262"/>
+            <joint name="l_arm_joint5" value="0"/>
+            <joint name="l_arm_joint6" value="2.0943"/>
+            <joint name="l_arm_joint7" value="0"/>
+            <joint name="waist_yaw_joint" value="0"/>
+        </group_state>
+    </xacro:if>
+    <xacro:if value="${ENABLE_TWO_ARM}">
+        <group_state name="two_arm_init_pose" group="two_arm_group">
+            <joint name="l_arm_joint1" value="0"/>
+            <joint name="l_arm_joint2" value="1.5707"/>
+            <joint name="l_arm_joint3" value="0"/>
+            <joint name="l_arm_joint4" value="-2.7262"/>
+            <joint name="l_arm_joint5" value="0"/>
+            <joint name="l_arm_joint6" value="2.09439"/>
+            <joint name="l_arm_joint7" value="0"/>
+            <joint name="r_arm_joint1" value="0"/>
+            <joint name="r_arm_joint2" value="-1.5707"/>
+            <joint name="r_arm_joint3" value="0"/>
+            <joint name="r_arm_joint4" value="2.7262"/>
+            <joint name="r_arm_joint5" value="0"/>
+            <joint name="r_arm_joint6" value="-2.0943"/>
+            <joint name="r_arm_joint7" value="0"/>
+        </group_state>
+    </xacro:if>
+    <xacro:if value="${ENABLE_TWO_ARM}">
+        <group_state name="two_arm_push_forward_pose" group="two_arm_group">
+            <joint name="l_arm_joint1" value="-0.5236"/>
+            <joint name="l_arm_joint2" value="1.5707"/>
+            <joint name="l_arm_joint3" value="0"/>
+            <joint name="l_arm_joint4" value="-2.0944"/>
+            <joint name="l_arm_joint5" value="0"/>
+            <joint name="l_arm_joint6" value="1.0472"/>
+            <joint name="l_arm_joint7" value="0"/>
+            <joint name="r_arm_joint1" value="0.5236"/>
+            <joint name="r_arm_joint2" value="-1.5707"/>
+            <joint name="r_arm_joint3" value="0"/>
+            <joint name="r_arm_joint4" value="2.0944"/>
+            <joint name="r_arm_joint5" value="0"/>
+            <joint name="r_arm_joint6" value="-1.0472"/>
+            <joint name="r_arm_joint7" value="0"/>
+        </group_state>
+    </xacro:if>
+    <xacro:if value="${ENABLE_HEAD}">
+        <group_state name="neck_init_pose" group="neck_group">
+            <joint name="neck_pitch_joint" value="0"/>
+            <joint name="neck_yaw_joint" value="0"/>
+        </group_state>
+    </xacro:if>
     <group_state name="waist_init_pose" group="waist_group">
         <joint name="waist_yaw_joint" value="0"/>
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
-    <end_effector name="l_gripper" parent_link="l_link7" group="l_gripper_group" parent_group="l_arm_group"/>
-    <end_effector name="r_gripper" parent_link="r_link7" group="r_gripper_group" parent_group="r_arm_group"/>
+    <xacro:if value="${ENABLE_GRIPPER_L}">
+        <end_effector name="l_gripper" parent_link="l_link7" group="l_gripper_group" parent_group="l_arm_group"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_GRIPPER_R}">
+        <end_effector name="r_gripper" parent_link="r_link7" group="r_gripper_group" parent_group="r_arm_group"/>
+    </xacro:if>
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
     <xacro:unless value="$(arg use_kachaka_base)">
         <!-- For fixed base mode: body_base_link is the root, fixed to the world frame.
@@ -162,8 +209,12 @@
         <virtual_joint name="base_footprint_to_odom_joint" type="planar" parent_frame="odom" child_link="base_footprint"/>
     </xacro:if>
     <!--PASSIVE JOINT: Purpose: this element is used to mark joints that are not actuated-->
-    <passive_joint name="l_gripper_mimic_joint"/>
-    <passive_joint name="r_gripper_mimic_joint"/>
+    <xacro:if value="${ENABLE_GRIPPER_L}">
+        <passive_joint name="l_gripper_mimic_joint"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_GRIPPER_R}">
+        <passive_joint name="r_gripper_mimic_joint"/>
+    </xacro:if>
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <xacro:if value="$(arg use_kachaka_base)">
         <!-- Kachaka mobile base subtree. These links are rigidly stacked by design and are
@@ -204,196 +255,578 @@
     </xacro:if>
     <disable_collisions link1="body_base_link" link2="body_link" reason="Adjacent"/>
     <disable_collisions link1="body_base_link" link2="chest_camera_link" reason="Never"/>
-    <disable_collisions link1="body_base_link" link2="head_camera_link" reason="Never"/>
-    <disable_collisions link1="body_base_link" link2="l_link1" reason="Never"/>
-    <disable_collisions link1="body_base_link" link2="l_link2" reason="Never"/>
-    <disable_collisions link1="body_base_link" link2="l_link3" reason="Never"/>
-    <disable_collisions link1="body_base_link" link2="neck_pitch_link" reason="Never"/>
-    <disable_collisions link1="body_base_link" link2="neck_yaw_link" reason="Never"/>
-    <disable_collisions link1="body_base_link" link2="r_link1" reason="Never"/>
-    <disable_collisions link1="body_base_link" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="body_base_link" link2="r_link3" reason="Never"/>
+    <xacro:if value="${ENABLE_HEAD}">
+        <disable_collisions link1="body_base_link" link2="head_camera_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="body_base_link" link2="l_link1" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="body_base_link" link2="l_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="body_base_link" link2="l_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_HEAD}">
+        <disable_collisions link1="body_base_link" link2="neck_pitch_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_HEAD}">
+        <disable_collisions link1="body_base_link" link2="neck_yaw_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="body_base_link" link2="r_link1" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="body_base_link" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="body_base_link" link2="r_link3" reason="Never"/>
+    </xacro:if>
     <disable_collisions link1="body_link" link2="chest_camera_link" reason="Adjacent"/>
-    <disable_collisions link1="body_link" link2="l_link1" reason="Adjacent"/>
-    <disable_collisions link1="body_link" link2="l_link2" reason="Never"/>
-    <disable_collisions link1="body_link" link2="l_link3" reason="Never"/>
-    <disable_collisions link1="body_link" link2="neck_yaw_link" reason="Adjacent"/>
-    <disable_collisions link1="body_link" link2="r_link1" reason="Adjacent"/>
-    <disable_collisions link1="body_link" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="body_link" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="chest_camera_link" link2="head_camera_link" reason="Never"/>
-    <disable_collisions link1="chest_camera_link" link2="l_link1" reason="Never"/>
-    <disable_collisions link1="chest_camera_link" link2="l_link2" reason="Never"/>
-    <disable_collisions link1="chest_camera_link" link2="l_link3" reason="Never"/>
-    <disable_collisions link1="chest_camera_link" link2="l_link4" reason="Never"/>
-    <disable_collisions link1="chest_camera_link" link2="l_link5_armarker" reason="Never"/>
-    <disable_collisions link1="chest_camera_link" link2="neck_pitch_link" reason="Never"/>
-    <disable_collisions link1="chest_camera_link" link2="neck_yaw_link" reason="Never"/>
-    <disable_collisions link1="chest_camera_link" link2="r_link1" reason="Never"/>
-    <disable_collisions link1="chest_camera_link" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="chest_camera_link" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="chest_camera_link" link2="r_link4" reason="Never"/>
-    <disable_collisions link1="chest_camera_link" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="head_camera_link" link2="l_link2" reason="Never"/>
-    <disable_collisions link1="head_camera_link" link2="l_link3" reason="Never"/>
-    <disable_collisions link1="head_camera_link" link2="l_link4" reason="Never"/>
-    <disable_collisions link1="head_camera_link" link2="l_link5_armarker" reason="Never"/>
-    <disable_collisions link1="head_camera_link" link2="neck_pitch_link" reason="Adjacent"/>
-    <disable_collisions link1="head_camera_link" link2="neck_yaw_link" reason="Never"/>
-    <disable_collisions link1="head_camera_link" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="head_camera_link" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="head_camera_link" link2="r_link4" reason="Never"/>
-    <disable_collisions link1="head_camera_link" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="l_gripperA_link" link2="l_gripperB_link" reason="Default"/>
-    <disable_collisions link1="l_gripperA_link" link2="l_link3" reason="Never"/>
-    <disable_collisions link1="l_gripperA_link" link2="l_link4" reason="Never"/>
-    <disable_collisions link1="l_gripperA_link" link2="l_link5_armarker" reason="Never"/>
-    <disable_collisions link1="l_gripperA_link" link2="l_link6" reason="Never"/>
-    <disable_collisions link1="l_gripperA_link" link2="l_link7" reason="Adjacent"/>
-    <disable_collisions link1="l_gripperA_link" link2="r_link1" reason="Never"/>
-    <disable_collisions link1="l_gripperA_link" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="l_gripperB_link" link2="l_link3" reason="Never"/>
-    <disable_collisions link1="l_gripperB_link" link2="l_link4" reason="Never"/>
-    <disable_collisions link1="l_gripperB_link" link2="l_link5_armarker" reason="Never"/>
-    <disable_collisions link1="l_gripperB_link" link2="l_link6" reason="Never"/>
-    <disable_collisions link1="l_gripperB_link" link2="l_link7" reason="Adjacent"/>
-    <disable_collisions link1="l_gripperB_link" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="l_gripperB_link" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="l_link1" link2="l_link2" reason="Adjacent"/>
-    <disable_collisions link1="l_link1" link2="l_link3" reason="Never"/>
-    <disable_collisions link1="l_link1" link2="l_link4" reason="Never"/>
-    <disable_collisions link1="l_link1" link2="l_link5_armarker" reason="Never"/>
-    <disable_collisions link1="l_link1" link2="neck_yaw_link" reason="Never"/>
-    <disable_collisions link1="l_link1" link2="r_gripperB_link" reason="Never"/>
-    <disable_collisions link1="l_link1" link2="r_link1" reason="Never"/>
-    <disable_collisions link1="l_link1" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="l_link1" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="l_link1" link2="r_link4" reason="Never"/>
-    <disable_collisions link1="l_link1" link2="r_link5" reason="Never"/>
-    <disable_collisions link1="l_link1" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="l_link1" link2="r_link6" reason="Never"/>
-    <disable_collisions link1="l_link1" link2="r_link7" reason="Never"/>
-    <disable_collisions link1="l_link2" link2="l_link3" reason="Adjacent"/>
-    <disable_collisions link1="l_link2" link2="l_link4" reason="Never"/>
-    <disable_collisions link1="l_link2" link2="l_link5_armarker" reason="Never"/>
-    <disable_collisions link1="l_link2" link2="l_link6" reason="Never"/>
-    <disable_collisions link1="l_link2" link2="neck_pitch_link" reason="Never"/>
-    <disable_collisions link1="l_link2" link2="neck_yaw_link" reason="Never"/>
-    <disable_collisions link1="l_link2" link2="r_gripperA_link" reason="Never"/>
-    <disable_collisions link1="l_link2" link2="r_gripperB_link" reason="Never"/>
-    <disable_collisions link1="l_link2" link2="r_link1" reason="Never"/>
-    <disable_collisions link1="l_link2" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="l_link2" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="l_link2" link2="r_link4" reason="Never"/>
-    <disable_collisions link1="l_link2" link2="r_link5" reason="Never"/>
-    <disable_collisions link1="l_link2" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="l_link2" link2="r_link6" reason="Never"/>
-    <disable_collisions link1="l_link2" link2="r_link7" reason="Never"/>
-    <disable_collisions link1="l_link3" link2="l_link4" reason="Adjacent"/>
-    <disable_collisions link1="l_link3" link2="l_link5" reason="Never"/>
-    <disable_collisions link1="l_link3" link2="l_link5_armarker" reason="Never"/>
-    <disable_collisions link1="l_link3" link2="l_link6" reason="Never"/>
-    <disable_collisions link1="l_link3" link2="l_link7" reason="Never"/>
-    <disable_collisions link1="l_link3" link2="neck_pitch_link" reason="Never"/>
-    <disable_collisions link1="l_link3" link2="neck_yaw_link" reason="Never"/>
-    <disable_collisions link1="l_link3" link2="r_gripperB_link" reason="Never"/>
-    <disable_collisions link1="l_link3" link2="r_link1" reason="Never"/>
-    <disable_collisions link1="l_link3" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="l_link3" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="l_link3" link2="r_link4" reason="Never"/>
-    <disable_collisions link1="l_link3" link2="r_link5" reason="Never"/>
-    <disable_collisions link1="l_link3" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="l_link3" link2="r_link6" reason="Never"/>
-    <disable_collisions link1="l_link3" link2="r_link7" reason="Never"/>
-    <disable_collisions link1="l_link4" link2="l_link5" reason="Adjacent"/>
-    <disable_collisions link1="l_link4" link2="l_link5_armarker" reason="Never"/>
-    <disable_collisions link1="l_link4" link2="l_link6" reason="Never"/>
-    <disable_collisions link1="l_link4" link2="l_link7" reason="Never"/>
-    <disable_collisions link1="l_link4" link2="neck_pitch_link" reason="Never"/>
-    <disable_collisions link1="l_link4" link2="neck_yaw_link" reason="Never"/>
-    <disable_collisions link1="l_link4" link2="r_gripperB_link" reason="Never"/>
-    <disable_collisions link1="l_link4" link2="r_link1" reason="Never"/>
-    <disable_collisions link1="l_link4" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="l_link4" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="l_link4" link2="r_link4" reason="Never"/>
-    <disable_collisions link1="l_link4" link2="r_link5" reason="Never"/>
-    <disable_collisions link1="l_link4" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="l_link4" link2="r_link6" reason="Never"/>
-    <disable_collisions link1="l_link5" link2="l_link5_armarker" reason="Adjacent"/>
-    <disable_collisions link1="l_link5" link2="l_link6" reason="Adjacent"/>
-    <disable_collisions link1="l_link5" link2="l_link7" reason="Never"/>
-    <disable_collisions link1="l_link5" link2="neck_yaw_link" reason="Never"/>
-    <disable_collisions link1="l_link5" link2="r_link1" reason="Never"/>
-    <disable_collisions link1="l_link5" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="l_link5" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="l_link5" link2="r_link4" reason="Never"/>
-    <disable_collisions link1="l_link5_armarker" link2="l_link6" reason="Never"/>
-    <disable_collisions link1="l_link5_armarker" link2="l_link7" reason="Never"/>
-    <disable_collisions link1="l_link5_armarker" link2="neck_yaw_link" reason="Never"/>
-    <disable_collisions link1="l_link5_armarker" link2="r_gripperA_link" reason="Never"/>
-    <disable_collisions link1="l_link5_armarker" link2="r_gripperB_link" reason="Never"/>
-    <disable_collisions link1="l_link5_armarker" link2="r_link1" reason="Never"/>
-    <disable_collisions link1="l_link5_armarker" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="l_link5_armarker" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="l_link5_armarker" link2="r_link4" reason="Never"/>
-    <disable_collisions link1="l_link5_armarker" link2="r_link5" reason="Never"/>
-    <disable_collisions link1="l_link5_armarker" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="l_link5_armarker" link2="r_link6" reason="Never"/>
-    <disable_collisions link1="l_link5_armarker" link2="r_link7" reason="Never"/>
-    <disable_collisions link1="l_link6" link2="l_link7" reason="Adjacent"/>
-    <disable_collisions link1="l_link6" link2="r_link1" reason="Never"/>
-    <disable_collisions link1="l_link6" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="l_link6" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="l_link6" link2="r_link4" reason="Never"/>
-    <disable_collisions link1="l_link6" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="l_link7" link2="r_link1" reason="Never"/>
-    <disable_collisions link1="l_link7" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="l_link7" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="l_link7" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="neck_pitch_link" link2="neck_yaw_link" reason="Adjacent"/>
-    <disable_collisions link1="neck_pitch_link" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="neck_pitch_link" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="neck_pitch_link" link2="r_link4" reason="Never"/>
-    <disable_collisions link1="neck_pitch_link" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="neck_yaw_link" link2="r_link1" reason="Never"/>
-    <disable_collisions link1="neck_yaw_link" link2="r_link2" reason="Never"/>
-    <disable_collisions link1="neck_yaw_link" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="neck_yaw_link" link2="r_link4" reason="Never"/>
-    <disable_collisions link1="neck_yaw_link" link2="r_link5" reason="Never"/>
-    <disable_collisions link1="neck_yaw_link" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="r_gripperA_link" link2="r_gripperB_link" reason="Default"/>
-    <disable_collisions link1="r_gripperA_link" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="r_gripperA_link" link2="r_link4" reason="Never"/>
-    <disable_collisions link1="r_gripperA_link" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="r_gripperA_link" link2="r_link6" reason="Never"/>
-    <disable_collisions link1="r_gripperA_link" link2="r_link7" reason="Adjacent"/>
-    <disable_collisions link1="r_gripperB_link" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="r_gripperB_link" link2="r_link4" reason="Never"/>
-    <disable_collisions link1="r_gripperB_link" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="r_gripperB_link" link2="r_link6" reason="Never"/>
-    <disable_collisions link1="r_gripperB_link" link2="r_link7" reason="Adjacent"/>
-    <disable_collisions link1="r_link1" link2="r_link2" reason="Adjacent"/>
-    <disable_collisions link1="r_link1" link2="r_link3" reason="Never"/>
-    <disable_collisions link1="r_link1" link2="r_link4" reason="Never"/>
-    <disable_collisions link1="r_link1" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="r_link2" link2="r_link3" reason="Adjacent"/>
-    <disable_collisions link1="r_link2" link2="r_link4" reason="Never"/>
-    <disable_collisions link1="r_link2" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="r_link2" link2="r_link6" reason="Never"/>
-    <disable_collisions link1="r_link2" link2="r_link7" reason="Never"/>
-    <disable_collisions link1="r_link3" link2="r_link4" reason="Adjacent"/>
-    <disable_collisions link1="r_link3" link2="r_link5" reason="Never"/>
-    <disable_collisions link1="r_link3" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="r_link3" link2="r_link6" reason="Never"/>
-    <disable_collisions link1="r_link3" link2="r_link7" reason="Never"/>
-    <disable_collisions link1="r_link4" link2="r_link5" reason="Adjacent"/>
-    <disable_collisions link1="r_link4" link2="r_link5_armarker" reason="Never"/>
-    <disable_collisions link1="r_link4" link2="r_link6" reason="Never"/>
-    <disable_collisions link1="r_link4" link2="r_link7" reason="Never"/>
-    <disable_collisions link1="r_link5" link2="r_link5_armarker" reason="Adjacent"/>
-    <disable_collisions link1="r_link5" link2="r_link6" reason="Adjacent"/>
-    <disable_collisions link1="r_link5" link2="r_link7" reason="Never"/>
-    <disable_collisions link1="r_link5_armarker" link2="r_link6" reason="Never"/>
-    <disable_collisions link1="r_link5_armarker" link2="r_link7" reason="Never"/>
-    <disable_collisions link1="r_link6" link2="r_link7" reason="Adjacent"/>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="body_link" link2="l_link1" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="body_link" link2="l_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="body_link" link2="l_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_HEAD}">
+        <disable_collisions link1="body_link" link2="neck_yaw_link" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="body_link" link2="r_link1" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="body_link" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="body_link" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_HEAD}">
+        <disable_collisions link1="chest_camera_link" link2="head_camera_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="chest_camera_link" link2="l_link1" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="chest_camera_link" link2="l_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="chest_camera_link" link2="l_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="chest_camera_link" link2="l_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="chest_camera_link" link2="l_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_HEAD}">
+        <disable_collisions link1="chest_camera_link" link2="neck_pitch_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_HEAD}">
+        <disable_collisions link1="chest_camera_link" link2="neck_yaw_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="chest_camera_link" link2="r_link1" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="chest_camera_link" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="chest_camera_link" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="chest_camera_link" link2="r_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="chest_camera_link" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_HEAD}">
+        <disable_collisions link1="head_camera_link" link2="l_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_HEAD}">
+        <disable_collisions link1="head_camera_link" link2="l_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_HEAD}">
+        <disable_collisions link1="head_camera_link" link2="l_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_HEAD}">
+        <disable_collisions link1="head_camera_link" link2="l_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_HEAD}">
+        <disable_collisions link1="head_camera_link" link2="neck_pitch_link" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_HEAD}">
+        <disable_collisions link1="head_camera_link" link2="neck_yaw_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_HEAD}">
+        <disable_collisions link1="head_camera_link" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_HEAD}">
+        <disable_collisions link1="head_camera_link" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_HEAD}">
+        <disable_collisions link1="head_camera_link" link2="r_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_HEAD}">
+        <disable_collisions link1="head_camera_link" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_GRIPPER_L}">
+        <disable_collisions link1="l_gripperA_link" link2="l_gripperB_link" reason="Default"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_L}">
+        <disable_collisions link1="l_gripperA_link" link2="l_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_L}">
+        <disable_collisions link1="l_gripperA_link" link2="l_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_L}">
+        <disable_collisions link1="l_gripperA_link" link2="l_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_L}">
+        <disable_collisions link1="l_gripperA_link" link2="l_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_L}">
+        <disable_collisions link1="l_gripperA_link" link2="l_link7" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_GRIPPER_L}">
+        <disable_collisions link1="l_gripperA_link" link2="r_link1" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_GRIPPER_L}">
+        <disable_collisions link1="l_gripperA_link" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_L}">
+        <disable_collisions link1="l_gripperB_link" link2="l_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_L}">
+        <disable_collisions link1="l_gripperB_link" link2="l_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_L}">
+        <disable_collisions link1="l_gripperB_link" link2="l_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_L}">
+        <disable_collisions link1="l_gripperB_link" link2="l_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_L}">
+        <disable_collisions link1="l_gripperB_link" link2="l_link7" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_GRIPPER_L}">
+        <disable_collisions link1="l_gripperB_link" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_GRIPPER_L}">
+        <disable_collisions link1="l_gripperB_link" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link1" link2="l_link2" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link1" link2="l_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link1" link2="l_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link1" link2="l_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_HEAD}">
+        <disable_collisions link1="l_link1" link2="neck_yaw_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="l_link1" link2="r_gripperB_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link1" link2="r_link1" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link1" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link1" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link1" link2="r_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link1" link2="r_link5" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link1" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link1" link2="r_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link1" link2="r_link7" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link2" link2="l_link3" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link2" link2="l_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link2" link2="l_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link2" link2="l_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_HEAD}">
+        <disable_collisions link1="l_link2" link2="neck_pitch_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_HEAD}">
+        <disable_collisions link1="l_link2" link2="neck_yaw_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="l_link2" link2="r_gripperA_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="l_link2" link2="r_gripperB_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link2" link2="r_link1" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link2" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link2" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link2" link2="r_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link2" link2="r_link5" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link2" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link2" link2="r_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link2" link2="r_link7" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link3" link2="l_link4" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link3" link2="l_link5" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link3" link2="l_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link3" link2="l_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link3" link2="l_link7" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_HEAD}">
+        <disable_collisions link1="l_link3" link2="neck_pitch_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_HEAD}">
+        <disable_collisions link1="l_link3" link2="neck_yaw_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="l_link3" link2="r_gripperB_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link3" link2="r_link1" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link3" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link3" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link3" link2="r_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link3" link2="r_link5" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link3" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link3" link2="r_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link3" link2="r_link7" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link4" link2="l_link5" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link4" link2="l_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link4" link2="l_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link4" link2="l_link7" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_HEAD}">
+        <disable_collisions link1="l_link4" link2="neck_pitch_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_HEAD}">
+        <disable_collisions link1="l_link4" link2="neck_yaw_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="l_link4" link2="r_gripperB_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link4" link2="r_link1" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link4" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link4" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link4" link2="r_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link4" link2="r_link5" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link4" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link4" link2="r_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link5" link2="l_link5_armarker" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link5" link2="l_link6" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link5" link2="l_link7" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_HEAD}">
+        <disable_collisions link1="l_link5" link2="neck_yaw_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link5" link2="r_link1" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link5" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link5" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link5" link2="r_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link5_armarker" link2="l_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link5_armarker" link2="l_link7" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_HEAD}">
+        <disable_collisions link1="l_link5_armarker" link2="neck_yaw_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="l_link5_armarker" link2="r_gripperA_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="l_link5_armarker" link2="r_gripperB_link" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link5_armarker" link2="r_link1" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link5_armarker" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link5_armarker" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link5_armarker" link2="r_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link5_armarker" link2="r_link5" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link5_armarker" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link5_armarker" link2="r_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link5_armarker" link2="r_link7" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L}">
+        <disable_collisions link1="l_link6" link2="l_link7" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link6" link2="r_link1" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link6" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link6" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link6" link2="r_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link6" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link7" link2="r_link1" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link7" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link7" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_L and ENABLE_ARM_R}">
+        <disable_collisions link1="l_link7" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_HEAD}">
+        <disable_collisions link1="neck_pitch_link" link2="neck_yaw_link" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_HEAD}">
+        <disable_collisions link1="neck_pitch_link" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_HEAD}">
+        <disable_collisions link1="neck_pitch_link" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_HEAD}">
+        <disable_collisions link1="neck_pitch_link" link2="r_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_HEAD}">
+        <disable_collisions link1="neck_pitch_link" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_HEAD}">
+        <disable_collisions link1="neck_yaw_link" link2="r_link1" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_HEAD}">
+        <disable_collisions link1="neck_yaw_link" link2="r_link2" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_HEAD}">
+        <disable_collisions link1="neck_yaw_link" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_HEAD}">
+        <disable_collisions link1="neck_yaw_link" link2="r_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_HEAD}">
+        <disable_collisions link1="neck_yaw_link" link2="r_link5" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_HEAD}">
+        <disable_collisions link1="neck_yaw_link" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_GRIPPER_R}">
+        <disable_collisions link1="r_gripperA_link" link2="r_gripperB_link" reason="Default"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="r_gripperA_link" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="r_gripperA_link" link2="r_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="r_gripperA_link" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="r_gripperA_link" link2="r_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="r_gripperA_link" link2="r_link7" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="r_gripperB_link" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="r_gripperB_link" link2="r_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="r_gripperB_link" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="r_gripperB_link" link2="r_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R and ENABLE_GRIPPER_R}">
+        <disable_collisions link1="r_gripperB_link" link2="r_link7" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link1" link2="r_link2" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link1" link2="r_link3" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link1" link2="r_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link1" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link2" link2="r_link3" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link2" link2="r_link4" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link2" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link2" link2="r_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link2" link2="r_link7" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link3" link2="r_link4" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link3" link2="r_link5" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link3" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link3" link2="r_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link3" link2="r_link7" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link4" link2="r_link5" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link4" link2="r_link5_armarker" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link4" link2="r_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link4" link2="r_link7" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link5" link2="r_link5_armarker" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link5" link2="r_link6" reason="Adjacent"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link5" link2="r_link7" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link5_armarker" link2="r_link6" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link5_armarker" link2="r_link7" reason="Never"/>
+    </xacro:if>
+    <xacro:if value="${ENABLE_ARM_R}">
+        <disable_collisions link1="r_link6" link2="r_link7" reason="Adjacent"/>
+    </xacro:if>
 </robot>
