@@ -106,6 +106,14 @@ def generate_launch_description():
         description='Enable Kachaka mobile base.'
     )
 
+    component_args = ['enable_head', 'enable_arm_right', 'enable_arm_left',
+                      'enable_gripper_right', 'enable_gripper_left']
+
+    declare_components = [
+        DeclareLaunchArgument(name, default_value='true', description='Build this component.')
+        for name in component_args
+    ]
+
     description_loader = RobotDescriptionLoader()
     description_loader.port_name = LaunchConfiguration('port_name')
     description_loader.baudrate = LaunchConfiguration('baudrate')
@@ -123,6 +131,8 @@ def generate_launch_description():
         'manipulator_config_file_path'
     )
     description_loader.use_kachaka_base = LaunchConfiguration('use_kachaka_base')
+    for name in component_args:
+        setattr(description_loader, name, LaunchConfiguration(name))
     loaded_description = description_loader.load()
 
     robot_state_publisher = Node(
@@ -151,6 +161,7 @@ def generate_launch_description():
         executable='spawner',
         output='screen',
         arguments=['right_arm_controller'],
+        condition=IfCondition(LaunchConfiguration('enable_arm_right')),
     )
 
     spawn_right_gripper_controller = Node(
@@ -158,6 +169,7 @@ def generate_launch_description():
         executable='spawner',
         output='screen',
         arguments=['right_gripper_controller'],
+        condition=IfCondition(LaunchConfiguration('enable_gripper_right')),
     )
 
     spawn_left_arm_controller = Node(
@@ -165,6 +177,7 @@ def generate_launch_description():
         executable='spawner',
         output='screen',
         arguments=['left_arm_controller'],
+        condition=IfCondition(LaunchConfiguration('enable_arm_left')),
     )
 
     spawn_left_gripper_controller = Node(
@@ -172,6 +185,7 @@ def generate_launch_description():
         executable='spawner',
         output='screen',
         arguments=['left_gripper_controller'],
+        condition=IfCondition(LaunchConfiguration('enable_gripper_left')),
     )
 
     spawn_neck_controller = Node(
@@ -179,6 +193,7 @@ def generate_launch_description():
         executable='spawner',
         output='screen',
         arguments=['neck_controller'],
+        condition=IfCondition(LaunchConfiguration('enable_head')),
     )
 
     spawn_waist_yaw_controller = Node(
@@ -210,6 +225,7 @@ def generate_launch_description():
             declare_gz_control_config_package,
             declare_gz_control_config_file_path,
             declare_use_kachaka_base,
+            *declare_components,
             robot_state_publisher,
             controller_manager,
             spawn_right_arm_controller,
