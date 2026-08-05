@@ -1,138 +1,347 @@
-[English](README.en.md) | [日本語](README.md)
+<a name="readme-top"></a>
+
+[EN](README.md) | [JA](README_ja.md)
 
 # sciurus17_ros
 
-[![industrial_ci](https://github.com/rt-net/sciurus17_ros/actions/workflows/industrial_ci.yml/badge.svg?branch=ros2)](https://github.com/rt-net/sciurus17_ros/actions/workflows/industrial_ci.yml)
+ROS 2 packages for driving the [Sciurus17](https://www.rt-net.jp/products/sciurus17), with optional
+support for mounting it on a [Kachaka](https://kachaka.life/) mobile base to
+turn it into a mobile manipulator.
 
-ROS 2でSciurusS17を動作させるパッケージです。
+![sciurus17_gazebo](https://rt-net.github.io/images/sciurus17/sciurus17_gazebo2.png "sciurus17_gazebo")
 
-![sciurus17\_gazebo](https://rt-net.github.io/images/sciurus17/sciurus17_gazebo2.png "sciurus17_gazebo")
+<!-- Table of Contents -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#overview">Overview</a></li>
+    <li>
+      <a href="#setup">Setup</a>
+      <ul>
+        <li><a href="#requirements">Requirements</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#usage">Usage</a>
+      <ul>
+        <li><a href="#device-setup">Device Setup</a></li>
+        <li><a href="#quick-start">Quick Start</a></li>
+        <li><a href="#running-with-the-kachaka-base">Running with the Kachaka base</a></li>
+        <li><a href="#visualization-in-rviz2">Visualization in RViz2</a></li>
+        <li><a href="#running-the-simulator">Running the simulator</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#base-configurations">Base Configurations</a>
+      <ul>
+        <li><a href="#frame-naming">Frame naming</a></li>
+        <li><a href="#kinematic-structure">Kinematic structure</a></li>
+      </ul>
+    </li>
+    <li><a href="#packages">Packages</a></li>
+    <li><a href="#examples">Examples</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+  </ol>
+</details>
 
-## Table of Contents
+## Overview
 
-- [sciurus17\_ros](#sciurus17_ros)
-  - [Table of Contents](#table-of-contents)
-  - [Supported ROS 2 distributions](#supported-ros-2-distributions)
-  - [Requirements](#requirements)
-  - [Installation](#installation)
-  - [Quick Start](#quick-start)
-  - [Packages](#packages)
-  - [How to Use Examples](#how-to-use-examples)
-  - [License](#license)
-  - [Contributing](#contributing)
+This repository drives the Sciurus17 dual-arm robot under ROS 2. In addition to
+the standard fixed-base configuration, it supports mounting the upper body on a
+Kachaka mobile base, which is selected with the `use_kachaka_base` argument.
 
-## Supported ROS 2 distributions
+> [!CAUTION]
+> If you are new to the robot, work alongside an experienced member when
+> operating the real hardware.
 
-- [Humble Hawksbill](https://github.com/rt-net/sciurus17_ros/tree/humble)
-- [Jazzy Jalisco](https://github.com/rt-net/sciurus17_ros/tree/jazzy)
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Requirements
+## Setup
 
-- Sciurus17
-  - [製品ページ](https://www.rt-net.jp/products/sciurus17)
-  - [ウェブショップ](https://www.rt-shop.jp/index.php?main_page=product_info&products_id=3895)
-- Linux OS
-  - Ubuntu 24.04
-- ROS 2
-  - [Jazzy Jalisco](https://docs.ros.org/en/jazzy/Installation.html)
+### Requirements
 
-## Installation
+| System | Version |
+| --- | --- |
+| Ubuntu | 24.04 (Noble Numbat) |
+| ROS | Jazzy Jalisco |
+| Python | 3.12 |
 
-### Source Build
+Hardware:
 
-```sh
-# Download packages
-mkdir -p ~/ros2_ws/src
-cd ~/ros2_ws/src
-git clone -b $ROS_DISTRO https://github.com/rt-net/sciurus17_ros.git
-git clone -b $ROS_DISTRO https://github.com/rt-net/sciurus17_description.git
+- Sciurus17 ([product page](https://www.rt-net.jp/products/sciurus17), [web shop](https://www.rt-shop.jp/index.php?main_page=product_info&products_id=3895))
+- Kachaka mobile base (only for the mobile manipulator configuration)
 
-# Install dependencies
-rosdep install -r -y -i --from-paths .
+> [!NOTE]
+> For installing `Ubuntu` and `ROS`, see the [SOBITS Manual](https://github.com/TeamSOBITS/sobits_manual#%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6).
 
-# Build & Install
-cd ~/ros2_ws
-colcon build --symlink-install
-source ~/ros2_ws/install/setup.bash
-```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Quick Start
+### Installation
+
+1. Move into the `src` folder of your ROS workspace.
+    ```sh
+    cd ~/colcon_ws/src/
+    ```
+
+2. Clone this repository.
+    ```sh
+    git clone -b $ROS_DISTRO https://github.com/TeamSOBITS/sciurus17_ros.git
+    ```
+
+3. Move into the repository.
+    ```sh
+    cd sciurus17_ros/
+    ```
+
+4. Install the dependencies.
+    ```sh
+    bash install.sh
+    ```
+
+5. Build.
+    ```sh
+    cd ~/colcon_ws/
+    source /opt/ros/$ROS_DISTRO/setup.bash
+    colcon build --symlink-install
+    source ~/colcon_ws/install/setup.bash
+    ```
+
+> [!NOTE]
+> `install.sh` clones `sciurus17_description`, `sciurus17_kachaka_description` and
+> `kachaka-api` next to this repository. `sciurus17_kachaka_description` is a
+> private repository, so you need access to the TeamSOBITS organization to
+> clone it. It is only required for the Kachaka configuration.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Usage
 
 ### Device Setup
 
-以下のコマンドで`sciurus17_control`が実機と通信するために用いるUSBシリアル変換デバイス名を固定します。
+Fix the name of the USB serial device that `sciurus17_control` uses to talk to
+the hardware:
 
 ```sh
 ros2 run sciurus17_tools create_udev_rules
 ```
 
-実行後に再起動しSciurus17を接続すると`/dev/sciurus17spine`が作成されるようになります。
+Reboot and reconnect the Sciurus17; `/dev/sciurus17spine` will then be created.
 
-### Run
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-以下のコマンドを実行すると、Sciurus17がグリッパ開閉動作をします。
+### Quick Start
+
+The following opens and closes the gripper.
 
 ```sh
-# Connect Sciurus17 to PC, then
-source ~/ros2_ws/install/setup.bash
+# Connect the Sciurus17 to the PC, then
+source ~/colcon_ws/install/setup.bash
 ros2 launch sciurus17_examples demo.launch.py
 
 # Terminal 2
-source ~/ros2_ws/install/setup.bash
+source ~/colcon_ws/install/setup.bash
 ros2 launch sciurus17_examples example.launch.py example:='gripper_control'
 
 # Press [Ctrl-c] to terminate.
 ```
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Running with the Kachaka base
+
+1. [Local environment] Start the ROS bridge container for the Kachaka.
+    ```sh
+    kachaka <Kachaka IP address> sciurus17 no yes
+    ```
+
+> [!WARNING]
+> The Kachaka IP address may change. Check it by asking the robot
+> ("ねぇカチャカ、IPアドレスを教えて") or through the Kachaka app.
+
+2. Launch the robot with the mobile base enabled.
+    ```sh
+    ros2 launch sciurus17_examples demo.launch.py use_kachaka_base:=true
+    ```
+
+> [!IMPORTANT]
+> Pass `use_kachaka_base` to the top-level launch file. It is forwarded from
+> there to the robot description, MoveIt and the controllers, so that all three
+> describe the same robot.
+
+If the robot does not come up, check that:
+
+- the emergency stop button is not engaged
+- the battery is sufficiently charged
+- the USB hub is connected to the PC
+- the Kachaka IP address is correct
+- `ROS_DOMAIN_ID` matches between the environments
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Visualization in RViz2
+
+```sh
+# Fixed base
+ros2 launch sciurus17_description display.launch.py
+
+# With the Kachaka base
+ros2 launch sciurus17_description display.launch.py use_kachaka_base:=true
+```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Running the simulator
+
+```sh
+# Fixed base
+ros2 launch sciurus17_gazebo sciurus17_gazebo.launch.py
+
+# With the Kachaka base
+ros2 launch sciurus17_gazebo sciurus17_gazebo.launch.py use_kachaka_base:=true
+```
+
+In the fixed-base configuration the robot is spawned on the table. With the
+Kachaka base it is spawned on the floor beside it, and `wheel_controller`
+(a `diff_drive_controller`) accepts velocity commands.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Base Configurations
+
+The robot description supports two configurations, selected with
+`use_kachaka_base`:
+
+| Value | Configuration |
+| --- | --- |
+| `false` (default) | Fixed base. The upper body is bolted to a static `world` frame. |
+| `true` | Kachaka base. The upper body is carried by a Kachaka mobile platform. |
+
+The default configuration has no dependency on the Kachaka packages.
+
+### Frame naming
+
+The manipulator base frame is `body_base_link`.
+
+This matters with the Kachaka base, because the Kachaka platform brings its own
+link called `base_link`. The two are different frames:
+
+| Frame | Meaning |
+| --- | --- |
+| `body_base_link` | Root of the Sciurus17 upper body (arms, neck, cameras) |
+| `base_link` | Kachaka mobile platform body (only with the Kachaka base) |
+
+> [!IMPORTANT]
+> Express manipulator goal poses in `body_base_link`. It exists in both
+> configurations, whereas `world` exists only without the Kachaka base and
+> `base_link` only with it.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Kinematic structure
+
+**Fixed base (`use_kachaka_base:=false`)**
+
+```
+world
+  └─ body_base_link
+      └─ body_link
+          ├─ neck_yaw_link
+          ├─ l_link1 (left arm)
+          └─ r_link1 (right arm)
+```
+
+`world -> body_base_link` is a fixed joint declared in the URDF, so
+`robot_state_publisher` publishes it.
+
+**Kachaka base (`use_kachaka_base:=true`)**
+
+```
+odom
+  └─ base_footprint
+      └─ base_link (Kachaka platform)
+          ├─ base_l_drive_wheel_link
+          ├─ base_r_drive_wheel_link
+          └─ kachaka_base_link
+              └─ sciurus17_vehicle_body_lower_front_link
+                  └─ sciurus17_vehicle_body_upper_link
+                      └─ body_base_link
+                          └─ body_link
+                              ├─ neck_yaw_link
+                              ├─ l_link1 (left arm)
+                              └─ r_link1 (right arm)
+```
+
+There is no `world` link in this mode. `odom -> base_footprint` is published by
+`wheel_controller` from wheel odometry, and the SRDF anchors the robot with a
+planar virtual joint accordingly.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ## Packages
 
 - sciurus17_control
   - [README](./sciurus17_control/README.md)
-  - Sciurus17の制御を行うパッケージです
-  - USB通信ポートの設定方法をREADMEに記載しています
+  - Controls the Sciurus17. Includes `wheel_controller` for the Kachaka base.
 - sciurus17_examples
   - [README](./sciurus17_examples/README.md)
-  - Sciurus17のサンプルコード集です  
+  - C++ sample code.
 - sciurus17_examples_py
   - [README](./sciurus17_examples_py/README.md)
-  - Sciurus17のPythonサンプルコード集です  
+  - Python sample code.
 - sciurus17_gazebo
-  - Sciurus17のGazeboシミュレーションパッケージです
+  - Gazebo simulation package.
 - sciurus17_moveit_config
-  - Sciurus17の`MoveIt 2`設定ファイルです
+  - `MoveIt 2` configuration. The SRDF is generated from
+    `config/sciurus17.srdf.xacro` so it can follow `use_kachaka_base`.
 - sciurus17_tools
-  - Sciurus17を活用するためのオプションツールをまとめたパッケージです
+  - Optional tools, including the udev rule generator.
 - sciurus17_vision
-  - カメラのlaunchファイルや画像認識を行うノードを定義するパッケージです
-  - 胸部カメラのキャリブレーションパラメータファイルは[chest_camera_info.yaml](./sciurus17_vision/config/chest_camera_info.yaml)です
-- sciurus17_description (外部パッケージ)
-  - [README](https://github.com/rt-net/sciurus17_description/blob/ros2/README.md)
-  - Sciurus17のモデルデータ（xacro）を定義するパッケージです
+  - Camera launch files and image recognition nodes. The chest camera
+    calibration is [chest_camera_info.yaml](./sciurus17_vision/config/chest_camera_info.yaml).
+- sciurus17_description (external package)
+  - [README](https://github.com/TeamSOBITS/sciurus17_description/blob/jazzy/README.md)
+  - Defines the Sciurus17 model data (xacro).
+- sciurus17_kachaka_description (external package, private)
+  - URDF macros and meshes for the Kachaka mount and vehicle body.
 
-## How to Use Examples
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-サンプルプログラムは、C++とPythonの両方を用意しています。詳しくは、以下のリンクをご覧ください。
+## Examples
 
-- C++
-  - [sciurus17\_examples](./sciurus17_examples/README.md)
-- Python
-  - [sciurus17\_examples\_py](./sciurus17_examples_py/README.md)
+Sample programs are provided in both C++ and Python:
+
+- C++ — [sciurus17_examples](./sciurus17_examples/README.md)
+- Python — [sciurus17_examples_py](./sciurus17_examples_py/README.md)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## License
 
 (C) 2018 RT Corporation \<support@rt-net.jp\>
 
-各ファイルにライセンスが明記されている場合、そのライセンスに従います。
-特に明記がない場合は、Apache License, Version 2.0に基づいて公開されています。  
-ライセンスの全文は[LICENSE](./LICENSE)または[https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0)から確認できます。
+Files with a license explicitly stated follow that license. Otherwise, this
+software is released under the Apache License, Version 2.0. The full text is
+available in [LICENSE](./LICENSE) or at
+[https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
-本パッケージが依存する[sciurus17_description](https://github.com/rt-net/sciurus17_description/tree/ros2)には株式会社アールティの非商用ライセンスが適用されています。
-詳細は[sciurus17_description/LICENSE](https://github.com/rt-net/sciurus17_description/blob/ros2/LICENSE)を参照してください。
+[sciurus17_description](https://github.com/TeamSOBITS/sciurus17_description), on
+which this package depends, is covered by RT Corporation's non-commercial
+license. See
+[sciurus17_description/LICENSE](https://github.com/TeamSOBITS/sciurus17_description/blob/jazzy/LICENSE)
+for details.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Contributing
 
-- 本ソフトウェアはオープンソースですが、開発はオープンではありません。
-- 本ソフトウェアは基本的にオープンソースソフトウェアとして「AS IS」（現状有姿のまま）で提供しています。
-- 本ソフトウェアに関する無償サポートはありません。
-- バグの修正や誤字脱字の修正に関するリクエストは常に受け付けていますが、それ以外の機能追加等のリクエストについては社内のガイドラインを優先します。
-詳しくは[コントリビューションガイドライン](https://github.com/rt-net/.github/blob/master/CONTRIBUTING.md#contribution-guide-ja)に従ってください。
+- This software is open source, but development is not open.
+- It is provided "AS IS" as open source software.
+- No free support is available.
+- Requests for bug fixes and typo corrections are always welcome. For other
+  feature requests, internal guidelines take precedence.
+
+See the [contribution guidelines](https://github.com/rt-net/.github/blob/master/CONTRIBUTING.md#contribution-guide-en).
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>

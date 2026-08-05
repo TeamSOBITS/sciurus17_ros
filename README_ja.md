@@ -193,10 +193,10 @@ ros2 launch sciurus17_description display.launch.py use_kachaka_base:=true
 
 ```sh
 # 固定ベース
-ros2 launch sciurus17_gazebo sciurus17_with_table.launch.py
+ros2 launch sciurus17_gazebo sciurus17_gazebo.launch.py
 
 # カチャカベース
-ros2 launch sciurus17_gazebo sciurus17_with_table.launch.py use_kachaka_base:=true
+ros2 launch sciurus17_gazebo sciurus17_gazebo.launch.py use_kachaka_base:=true
 ```
 
 固定ベース構成ではロボットはテーブル上に出現します。カチャカベースの場合はテーブルの横の床面に
