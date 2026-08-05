@@ -43,13 +43,26 @@ def generate_launch_description():
         'use_kachaka_base', default_value='false', description='Enable Kachaka mobile base.'
     )
 
+    component_args = ['enable_head', 'enable_arm_right', 'enable_arm_left',
+                      'enable_gripper_right', 'enable_gripper_left']
+
+    declare_components = [
+        DeclareLaunchArgument(name, default_value='true', description='Build this component.')
+        for name in component_args
+    ]
+
     description_loader = RobotDescriptionLoader()
     description_loader.use_kachaka_base = LaunchConfiguration('use_kachaka_base')
+    for name in component_args:
+        setattr(description_loader, name, LaunchConfiguration(name))
 
     moveit_config = (
         MoveItConfigsBuilder('sciurus17')
         .robot_description_semantic(
-            mappings={'use_kachaka_base': LaunchConfiguration('use_kachaka_base')}
+            mappings={
+                'use_kachaka_base': LaunchConfiguration('use_kachaka_base'),
+                **{name: LaunchConfiguration(name) for name in component_args},
+            }
         )
         .to_moveit_configs()
     )
@@ -70,6 +83,7 @@ def generate_launch_description():
             declare_example_name,
             declare_use_sim_time,
             declare_use_kachaka_base,
+            *declare_components,
             SetParameter(
                 name='use_sim_time', value=LaunchConfiguration('use_sim_time')
             ),
