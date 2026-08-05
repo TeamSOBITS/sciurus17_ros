@@ -19,6 +19,8 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.actions import ExecuteProcess
 from launch.actions import IncludeLaunchDescription
+from launch.conditions import IfCondition
+from launch.conditions import UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -33,6 +35,10 @@ def generate_launch_description():
 
     declare_use_chest_camera = DeclareLaunchArgument(
         'use_chest_camera', default_value='true', description='Use chest camera.'
+    )
+
+    declare_use_kachaka_base = DeclareLaunchArgument(
+        'use_kachaka_base', default_value='false', description='Enable Kachaka mobile base.'
     )
 
     declare_world_name = DeclareLaunchArgument(
@@ -77,12 +83,32 @@ def generate_launch_description():
             '-allow_renaming',
             'true',
         ],
+        condition=UnlessCondition(LaunchConfiguration('use_kachaka_base')),
+    )
+
+    # The Kachaka base stands on the floor next to the table instead of on top of it.
+    gz_sim_spawn_entity_with_kachaka = Node(
+        package='ros_gz_sim',
+        executable='create',
+        output='screen',
+        arguments=[
+            '-topic',
+            '/robot_description',
+            '-name',
+            'sciurus17',
+            '-x',
+            '-0.5',
+            '-allow_renaming',
+            'true',
+        ],
+        condition=IfCondition(LaunchConfiguration('use_kachaka_base')),
     )
 
     description_loader = RobotDescriptionLoader()
     description_loader.use_gazebo = 'true'
     description_loader.use_gazebo_head_camera = LaunchConfiguration('use_head_camera')
     description_loader.use_gazebo_chest_camera = LaunchConfiguration('use_chest_camera')
+    description_loader.use_kachaka_base = LaunchConfiguration('use_kachaka_base')
     description_loader.gz_control_config_package = 'sciurus17_control'
     description_loader.gz_control_config_file_path = 'config/sciurus17_controllers.yaml'
     description = description_loader.load()
@@ -107,6 +133,7 @@ def generate_launch_description():
             'use_gazebo_chest_camera': LaunchConfiguration('use_chest_camera'),
             'gz_control_config_package': 'sciurus17_control',
             'gz_control_config_file_path': 'config/sciurus17_controllers.yaml',
+            'use_kachaka_base': LaunchConfiguration('use_kachaka_base'),
         }.items(),
     )
 
@@ -159,6 +186,14 @@ def generate_launch_description():
         arguments=['waist_yaw_controller'],
     )
 
+    spawn_wheel_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        output='screen',
+        arguments=['wheel_controller'],
+        condition=IfCondition(LaunchConfiguration('use_kachaka_base')),
+    )
+
     bridge_file = os.path.join(
         get_package_share_directory('sciurus17_gazebo'), 'config', 'bridge.yaml'
     )
@@ -176,9 +211,11 @@ def generate_launch_description():
             declare_use_head_camera,
             declare_use_chest_camera,
             declare_world_name,
+            declare_use_kachaka_base,
             gz_sim,
             robot_state_publisher,
             gz_sim_spawn_entity,
+            gz_sim_spawn_entity_with_kachaka,
             move_group,
             spawn_joint_state_broadcaster,
             spawn_right_arm_controller,
@@ -187,6 +224,7 @@ def generate_launch_description():
             spawn_left_gripper_controller,
             spawn_neck_controller,
             spawn_waist_yaw_controller,
+            spawn_wheel_controller,
             bridge,
         ]
     )
