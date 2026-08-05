@@ -108,10 +108,15 @@ ROS 2で双腕ロボットSciurus17を動作させるためのパッケージで
     ```
 
 > [!NOTE]
-> `install.sh`は`sciurus17_description`、`sciurus17_kachaka_description`、`kachaka-api`を
-> 本レポジトリの隣にcloneします。`sciurus17_kachaka_description`はプライベートレポジトリのため、
-> cloneにはTeamSOBITS organizationへのアクセス権が必要です。
+> `install.sh`は`sciurus17_description`、`sciurus17_kachaka_description`、`kachaka-api`、
+> `realsense_ros`を本レポジトリの隣にcloneします。`sciurus17_kachaka_description`は
+> プライベートレポジトリのため、cloneにはTeamSOBITS organizationへのアクセス権が必要です。
 > カチャカ構成を使用しない場合は不要です。
+
+> [!IMPORTANT]
+> `realsense_ros`はaptではなくソースからビルドします。`realsense_ros`の`install.sh`が
+> `librealsense2`のビルドと、ヘッドカメラ・ハンドカメラの認識に必要なudevルールの設定も
+> 行うためです。`librealsense2`のコンパイルを伴うため、`install.sh`の初回実行には時間がかかります。
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
