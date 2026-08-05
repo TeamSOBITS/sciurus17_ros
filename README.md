@@ -87,7 +87,7 @@ Hardware:
 
 2. Clone this repository.
     ```sh
-    git clone -b $ROS_DISTRO https://github.com/TeamSOBITS/sciurus17_ros.git
+    git clone -b $ROS_DISTRO-devel https://github.com/TeamSOBITS/sciurus17_ros.git
     ```
 
 3. Move into the repository.
@@ -308,7 +308,7 @@ planar virtual joint accordingly.
   - Camera launch files and image recognition nodes. The chest camera
     calibration is [chest_camera_info.yaml](./sciurus17_vision/config/chest_camera_info.yaml).
 - sciurus17_description (external package)
-  - [README](https://github.com/TeamSOBITS/sciurus17_description/blob/jazzy/README.md)
+  - [README](https://github.com/TeamSOBITS/sciurus17_description/blob/jazzy-devel/README.md)
   - Defines the Sciurus17 model data (xacro).
 - sciurus17_kachaka_description (external package, private)
   - URDF macros and meshes for the Kachaka mount and vehicle body.
@@ -336,7 +336,7 @@ available in [LICENSE](./LICENSE) or at
 [sciurus17_description](https://github.com/TeamSOBITS/sciurus17_description), on
 which this package depends, is covered by RT Corporation's non-commercial
 license. See
-[sciurus17_description/LICENSE](https://github.com/TeamSOBITS/sciurus17_description/blob/jazzy/LICENSE)
+[sciurus17_description/LICENSE](https://github.com/TeamSOBITS/sciurus17_description/blob/jazzy-devel/LICENSE)
 for details.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

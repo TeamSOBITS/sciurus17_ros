@@ -86,7 +86,7 @@ ROS 2で双腕ロボットSciurus17を動作させるためのパッケージで
 
 2. 本レポジトリをcloneします。
     ```sh
-    git clone -b $ROS_DISTRO https://github.com/TeamSOBITS/sciurus17_ros.git
+    git clone -b $ROS_DISTRO-devel https://github.com/TeamSOBITS/sciurus17_ros.git
     ```
 
 3. レポジトリの中へ移動します。
@@ -300,7 +300,7 @@ odom
     胸部カメラのキャリブレーションパラメータファイルは
     [chest_camera_info.yaml](./sciurus17_vision/config/chest_camera_info.yaml)です。
 - sciurus17_description（外部パッケージ）
-  - [README](https://github.com/TeamSOBITS/sciurus17_description/blob/jazzy/README.md)
+  - [README](https://github.com/TeamSOBITS/sciurus17_description/blob/jazzy-devel/README.md)
   - Sciurus17のモデルデータ（xacro）を定義するパッケージです。
 - sciurus17_kachaka_description（外部パッケージ、プライベート）
   - カチャカ搭載部と車体フレームのURDFマクロとメッシュです。
@@ -328,7 +328,7 @@ odom
 
 本パッケージが依存する[sciurus17_description](https://github.com/TeamSOBITS/sciurus17_description)には
 株式会社アールティの非商用ライセンスが適用されています。詳細は
-[sciurus17_description/LICENSE](https://github.com/TeamSOBITS/sciurus17_description/blob/jazzy/LICENSE)を
+[sciurus17_description/LICENSE](https://github.com/TeamSOBITS/sciurus17_description/blob/jazzy-devel/LICENSE)を
 参照してください。
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
